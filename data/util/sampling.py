@@ -77,7 +77,7 @@ def get_data_loaders_uniform_without_replace(minibatch_size, microbatch_size, it
     def minibatch_loader(dataset):     #具体调用这个函数的时候会给对应入参
         return DataLoader(
             dataset,           #给定原本数据
-            batch_sampler=EquallySizedAndIndependentBatchSamplerWithoutReplace(dataset, minibatch_size, iterations) #自定义从数据集中取样本的策略，这边用IIDBatchSample函数进行样本抽取
+            batch_sampler=EquallySizedAndIndependentBatchSamplerWithoutReplace(dataset, minibatch_size, iterations) #DataLoader中自定义从数据集中取样本的策略
         )
 
     # 最里面一层的data，对上面组装好的minibatch进行操作，主要目的是将每个minibatch细分成多个microbatch

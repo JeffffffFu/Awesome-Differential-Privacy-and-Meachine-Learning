@@ -27,6 +27,7 @@ def centralization_train(train_data, test_data, batch_size, model, numEpoch, lea
 
     test_dl = torch.utils.data.DataLoader(
         test_data, batch_size=batch_size, shuffle=False)
+    print("train_dl:", train_dl.__dict__)
 
     print("------ Centralized Model ------")
     for epoch in range(numEpoch):

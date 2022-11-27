@@ -19,8 +19,9 @@ def train(model, train_loader, criterion, optimizer):
 
         optimizer.step()  # 参数优化更新
 
-        train_loss += loss.item()  # 损失累加
-        prediction = output.argmax(dim=1, keepdim=True)  # 将one-hot输出转为单个标量
-        correct += prediction.eq(target.view_as(prediction)).sum().item()  # 比较得到准确率
+    train_loss = loss.item()  # 损失累加
+    prediction = output.argmax(dim=1, keepdim=True)  # 将one-hot输出转为单个标量
+    correct = prediction.eq(target.view_as(prediction)).sum().item()  # 比较得到准确率
 
-    return train_loss / len(train_loader), correct / len(train_loader.dataset)  # 返回平均损失和平均准确率
+    return train_loss,correct
+    # return train_loss / len(train_loader), correct / len(train_loader.dataset)  # 返回平均损失和平均准确率

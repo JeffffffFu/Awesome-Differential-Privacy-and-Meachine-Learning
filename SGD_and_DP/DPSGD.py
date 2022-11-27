@@ -53,7 +53,6 @@ def centralization_train_dynamic_add_noise(train_data, test_data, model,batch_si
 
 
         train_dl = minibatch_loader(train_data)     #抽样
-
        #这里要动态加噪，每次传入的sigma可能会改变
         central_train_loss, central_train_accuracy = train_dynamic_add_noise(model, train_dl, centralized_criterion, optimizer)
 
@@ -96,6 +95,9 @@ def centralization_train_dynamic_add_noise(train_data, test_data, model,batch_si
 if __name__=="__main__":
 
     train_data, test_data = get_data('mnist', augment=False)
+   #  print(train_data.__dict__)
+   #
+   # # print(train_data[3,:])
     model = CNN()
     batch_size = 256
     learning_rate = 0.002

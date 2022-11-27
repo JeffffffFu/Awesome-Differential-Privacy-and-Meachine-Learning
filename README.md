@@ -2,6 +2,7 @@
 
 <!-- [![Stars](https://img.shields.io/github/stars/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data.svg?color=orange)](https://github.com/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data/stargazers)  [![Awesome](https://awesome.re/badge-flat.svg)](https://awesome.re) [![License](https://img.shields.io/github/license/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data.svg?color=green)](https://github.com/youngfish42/image-registration-resources/blob/master/LICENSE) ![](https://img.shields.io/github/last-commit/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data) -->
 
+bilibili（论文分享）:https://space.bilibili.com/80356866/dynamic
 
 **Table of Contents**
 
@@ -107,11 +108,16 @@ TO DO
 | Differentially Private Learning Needs Better Features (or Much More Data) | Stanford | ICLR/2021| 该论文以Nicolas的tanh优化为baseline进行比对，提出了人工的特征提取（handcrafted features）的方式，用了ScatterNet先进行特征提取，分别用ScatterNet+Linear model和ScatterNet+CNN都有很好的效果，目前看起来是最高的准确率（但是添加了预处理的步骤），该论文有代码，提供了相关超参数| 
 | Automatic Clipping: Differentially Private Deep Learning Made Easier and Stronger | AWS AI | ICLR/2022| 该论文以Nicolas的tanh优化为baseline进行比对，提出了最小化裁剪范数，然后整个裁剪加噪后的式子可以简化成裁剪范数和学习率的线性关系。作者提出只要取一个很小的裁剪范数，然后调整学习率就可以获得高的准确率，即固定一个很小的裁剪范数即可（范数裁剪不会影响梯度方向，因为是整体线性裁剪）。后面作者加了一个gamma在裁剪的时候使得收敛性得以证明，也比之前的baseline效果好一点点。这篇文章的结合DP的收敛性分析值得借鉴。| 
 | DPNAS: Neural Architecture Search for Deep Learning with Differential Privacy | Chinese Academy of Sciences | national conference on artificial intelligence/2021| 这篇论文是寻找最适合DP深度学习的网络结构，文章会在每层都提供一些网络设计，然后遍历的去尝试，哪种组合会更好，这篇文章实现的准确率比上一篇还高。他们发现了SELU激活函数表现比tanh好。| 
-
+| Label differential privacy via clustering | arXiv|Google/2021|提出了标签差分隐私，即对标签进行KRR扰动满足差分，但是在对标签扰动之前先进行聚类，使得相同分布的样本标签在同一簇中，聚类的过程有进行差分隐私加噪在标签上。然后簇中进行样本标签的扰动。最后在loss函数中行乘以对应扰动机制的逆进行矫正。以此完成图像分类任务。 | 
 ## DP and Federated Learning
 
 ### Federated Leaning
-想看更多的联邦学习文献推荐可以转到 [Awesome-Federated-Learning-on-Graph-and-GNN-papers](https://github.com/huweibo/Awesome-Federated-Learning-on-Graph-and-GNN-papers) and [Awesome-Federated-Machine-Learning](https://github.com/innovation-cat/Awesome-Federated-Machine-Learning#16-graph-neural-networks).
+想看更多的联邦学习文献推荐可以转到 :
+
+[Awesome-Federated-Learning-on-Graph-and-GNN-papers](https://github.com/huweibo/Awesome-Federated-Learning-on-Graph-and-GNN-papers) 
+
+ [Awesome-Federated-Machine-Learning](https://github.com/innovation-cat/Awesome-Federated-Machine-Learning#16-graph-neural-networks)
+
  [个性化联邦学习代码仓](https://github.com/microsoft/PersonalizedFL)
 
 | Title | Team/Main Author | Venue and Year | Key Description 
@@ -142,8 +148,8 @@ TO DO
 | Federated f-Differential Privacy | University of Pennsylvania | AISTATS/2021 | 样本级的差分隐私保护，提出了强联邦和弱联邦（个人认为弱联邦没什么意义），隐私度量采用GDP| 
 | User-Level Privacy-Preserving Federated Learning: Analysis and Performance Optimization | Nanjing University of Science and Technology | IEEE Transactions on Mobile Computing /2021 | 在客户端采样而不是客户端中的样本采样，但同样套用了MA的隐私度量方式（合理性存疑），后面加了一个基于隐私预算自适应最优迭代次数的方法，其实就是变相的自适应隐私预算分配。本篇论文是逐样本裁剪，且敏感度的选择看起来是simple-level[【vedio】](https://www.bilibili.com/video/BV16A4y1X74k?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
 | Federated Learning with Differential Privacy: Algorithms and Performance Analysis | Nanjing University of Science and Technology | IEEE Transactions on Information Forensics and Security/2019 | 先进行上行链路的隐私保护，然后再基于上行链路的加噪再对下行链路进行加噪，给出了收敛性分析。本篇论文虽然在本地模型加噪，但是敏感度的选择是基于客户端数量，属于client-level| 
-| Private, Efficient, and Accurate: Protecting Models Trained by Multi-party Learning with Differential Privacy | Fudan University | SP/2022 | 核心在于利用了多方安全的秘密分享构建出一个虚拟的联邦中心方，使的不同客户端的样本数据可以进行秘密分享后“集中”式训练，然后在再训练的梯度上加DP，以此满足模型的差分隐私。相较于之前的模型，该模型不用LDP,也不用shuffle，将所以客户端数据整合成集中式变成CDP的形式（这样可以用更小的eps，即不造成更大的精度损失），并且没有可信第三方。| 
-| Adap DP-FL: Differentially Private Federated Learning with Adaptive Noise  | ECNU | Trustcom/2022 | 主要是两个自适应点，一个是不同客户端不同轮的自适应裁剪范数，一个是不同轮的自适应噪声系数衰减。| 
+
+| Adap DP-FL: Differentially Private Federated Learning with Adaptive Noise  | Jie Fu | Trustcom/2022 | 主要是两个自适应点，一个是不同客户端不同轮的自适应裁剪范数，一个是不同轮的自适应噪声系数衰减。| 
 | DPAUC: Differentially Private AUC Computation in Federated Learning  | Jiankai Sun | 2022 | 作者举了一个联邦下客户端模型根据本地测试集进行性能评测算出AUC给中心方的场景，该场景认为AUC（ROC curve）会泄露客户端本地测试集隐私信息，故在传给中心方相关FP和FN等数值上加拉普拉斯噪声进行隐私保护。| 
 #### LDP-FL
 没有客户端中心方做小批量梯度下降，一般这种场景一个客户端只有一个样本数据，如果有多个样本数据会训练多个梯度上传给联邦中心方
@@ -168,7 +174,7 @@ TO DO
 [视频讲解](https://www.bilibili.com/video/BV14g411V7nZ?p=8&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)
 
 ## Attack
-[联邦学习中的攻击与防御]https://www.bilibili.com/video/BV14g411V7nZ?p=2&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3
+[联邦学习中的攻击与防御](https://www.bilibili.com/video/BV14g411V7nZ?p=2&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)
 
 [视觉算法的模型攻防](https://www.bilibili.com/video/BV1C34y1n7vV?spm_id_from=333.999.0.0)
 
@@ -194,13 +200,13 @@ TO DO
 ### DP and image
 | Title | Team/Main Author | Venue and Year | Key Description 
 | :------------| :------ | :---------- | :----------------------- 
-| DPGEN: Differentially Private Generative Energy-Guided Network for Natural Image Synthesis | Jia-Wei Chen | CVPR /2022 | 该文章基本基于《Generative Modeling by Estimating Gradients of the Data Distribution》的基础上添加差分隐私，就是在学习已有图片信息然后生成新的图片信息的过程中加差分隐私。存在两点问题，一是在做指数机制时其从当前数据中再取K个进行随机输出，这边K的取值没有进行隐私保护，二是其方法没有生成样本对于的标签信息，作者认为用生成的满足差分隐私的图像数据去查询标签不会泄露隐私，但其实会有隐私问题| 
+| DPGEN: Differentially Private Generative Energy-Guided Network for Natural Image Synthesis | Jia-Wei Chen | CVPR /2022 | 该文章基本基于《Generative Modeling by Estimating Gradients of the Data Distribution》的基础上添加差分隐私，就是在学习已有图片信息然后生成新的图片信息的过程中加差分隐私。存在两点问题，一是在做指数机制时其从当前数据中再取K个进行随机输出，这边K的取值没有进行隐私保护，二是其方法没有生成样本对于的标签信息，作者认为用生成的满足差分隐私的图像数据去查询标签不会泄露隐私，但其实会有隐私问题[【vedio】](https://www.bilibili.com/video/BV1me411V7pV/?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
 
 
 
 ### DP and cytro
 | Title | Team/Main Author | Venue and Year | Key Description 
 | :------------| :------ | :---------- | :----------------------- 
-| Efficient Differentially Private Secure Aggregation for Federated Learning via Hardness of Learning with Errors | University of Vermont | CCS/2021 | 该文章在原来的用同态加密进行联邦聚合的基础上，刻画了噪声的DP衡量，因为之前用的LWE天然存在噪声，所以该文章把这个噪声用DP量化出来。同时，也可以理解成其用同态加密的方法将原来的LDP加噪变成CDP的加噪方式，类似shuffle的理念。| 
-
+| Efficient Differentially Private Secure Aggregation for Federated Learning via Hardness of Learning with Errors | University of Vermont | CCS/2021 | 该文章在原来的用同态加密进行联邦聚合的基础上，刻画了噪声的DP衡量，因为之前用的LWE天然存在噪声，所以该文章把这个噪声用DP量化出来。同时，也可以理解成其用同态加密的方法将原来的LDP加噪变成CDP的加噪方式，类似shuffle的理念。[【vedio】](https://www.bilibili.com/video/BV1fR4y1D7dU/?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
+| Private, Efficient, and Accurate: Protecting Models Trained by Multi-party Learning with Differential Privacy | Fudan University | SP/2022 | 核心在于利用了多方安全的秘密分享构建出一个虚拟的联邦中心方，使的不同客户端的样本数据可以进行秘密分享后“集中”式训练，然后在再训练的梯度上加DP，以此满足模型的差分隐私。相较于之前的模型，该模型不用LDP,也不用shuffle，将所以客户端数据整合成集中式变成CDP的形式（这样可以用更小的eps，即不造成更大的精度损失），并且没有可信第三方。| 
 # Code
