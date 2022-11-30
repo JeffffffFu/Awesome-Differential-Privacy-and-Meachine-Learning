@@ -120,12 +120,13 @@ TO DO
 
  [个性化联邦学习代码仓](https://github.com/microsoft/PersonalizedFL)
 
-| Title | Team/Main Author | Venue and Year | Key Description 
-| :------------| :------ | :---------- | :----------------------- 
-| A Survey on Federated Learning Systems: Vision, Hype and Reality for Data Privacy and Protection | NUS | IEEE Transactions on Knowledge and Data Engineering/2021| 从各个维度对联邦学习进行总结分类，还有联邦学习主流开源库的对比，是比较完善全面的联邦学习综述 | 
-| Communication-efficient learning of deep networks from decentralized data | H Brendan McMahan | AISTATS/2017| 首次提出了FedAvg算法，即本地迭代多轮再参与联邦平均，可以大大的节省通讯成本 | 
-| Federated Optimization in Heterogeneous Networks | University of Pennsylvania |  Proceedings of Machine Learning and Systems/2020 | 针对Non-iid场景提出FedProx算法，与FedAvg的区别就是在客户端本地的损失函数上加了正则项（同时考虑中心方模型）防止本地迭代过拟合 | 
-| Adaptive Federated Learning in Resource Constrained Edge Computing Systems| Shiqiang Wang | JSAC/2019 | 在本地迭代资源与中心方聚合资源受限的情况下，最优化本地迭代次数，即最优化客户端参与中心方聚合的频率（文章的引言讲到如果不考虑资源受限，本地迭代一次就参与联邦是最好的）| 
+| Title                                                                                            | Team/Main Author | Venue and Year                                           | Key Description                                                                                                                     
+|:-------------------------------------------------------------------------------------------------| :------ |:---------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------
+| A Survey on Federated Learning Systems: Vision, Hype and Reality for Data Privacy and Protection | NUS | IEEE Transactions on Knowledge and Data Engineering/2021 | 从各个维度对联邦学习进行总结分类，还有联邦学习主流开源库的对比，是比较完善全面的联邦学习综述                                                                                      | 
+| Communication-efficient learning of deep networks from decentralized data                        | H Brendan McMahan | AISTATS/2017                                             | 首次提出了FedAvg算法，即本地迭代多轮再参与联邦平均，可以大大的节省通讯成本                                                                                            | 
+| Federated Optimization in Heterogeneous Networks                                                 | University of Pennsylvania | Proceedings of Machine Learning and Systems/2020         | 针对Non-iid场景提出FedProx算法，与FedAvg的区别就是在客户端本地的损失函数上加了正则项（同时考虑中心方模型）防止本地迭代过拟合                                                            | 
+| Adaptive Federated Learning in Resource Constrained Edge Computing Systems                       | Shiqiang Wang | JSAC/2019                                                | 在本地迭代资源与中心方聚合资源受限的情况下，最优化本地迭代次数，即最优化客户端参与中心方聚合的频率（文章的引言讲到如果不考虑资源受限，本地迭代一次就参与联邦是最好的，这里的迭代一次应该是一次epoch，需要训练完所有样本，不训练完本地所有样本可能这个结论不成立） | 
+| Layer-wised Model Aggregation for Personalized Federated Learning                                | Hong Kong Polytechnic University | CVPR/2022                                                | 中心方的加权平均上对每个客户端的模型每层的参数对实现了个性化的加权，权重的生成利用超网络，对每个客户端每层参数进行再学习，用每个客户端的模型和上一轮中心方模型的差当作损失值进行最小化。后面进一步为了降低通讯成本，选择本地保留权重大的层不参与联邦。         |                                                                                    | 
 
 ### Horizontal-FL with DP
 
