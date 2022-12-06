@@ -1,4 +1,3 @@
-from data.data_load.data_load_Mnist import dataload_mnist_60000
 from data.get_data import get_data
 from data.util.sampling import get_data_loaders_uniform_without_replace
 from model.CNN import CNN_tanh, CNN
@@ -10,7 +9,7 @@ from torch.utils.data import DataLoader
 
 from privacy_analysis.RDP.compute_rdp import compute_rdp
 from privacy_analysis.RDP.rdp_convert_dp import compute_eps
-from train_and_validation.train_with_dp import train_dynamic_add_noise
+from train_and_validation.train_with_dp import  train_dynamic_add_noise
 from train_and_validation.validation import validation
 from openpyxl import Workbook
 import time
@@ -58,15 +57,14 @@ def centralization_train_dynamic_add_noise(train_data, test_data, model,batch_si
 
         central_test_loss, central_test_accuracy = validation(model, test_dl)
 
-        # 这里要每次根据simga累加它的RDP，循环结束再转为eps，这里的epoch系数直接设为1，每次算一轮累和
-        rdp_every_epoch=compute_rdp(batch_size/len(train_data), sigma, 1, orders)
+        # 这里要每次根据simga累加它的RDP，循环结束再转为eps，这里的epoch系数直接设为iterations(epoch里的迭代次数)，每次算一轮累和
+        rdp_every_epoch=compute_rdp(batch_size/len(train_data), sigma, 1*iterations, orders)
         rdp=rdp+rdp_every_epoch
         epsilon, best_alpha = compute_eps(orders, rdp, delta)
         epsilon_list.append(epsilon)
 
         result_loss_list.append(central_test_loss)
         result_acc_list.append(central_test_accuracy)
-
 
         print("epoch: {:3.0f}".format(epoch + 1) + " | epsilon: {:7.4f}".format(
         epsilon) + " | best_alpha: {:7.4f}".format(best_alpha)  )

@@ -1,5 +1,5 @@
 from FL_and_DP.fl_related_funtion.center_average_model_with_weights import set_averaged_weights_as_main_model_weights
-from FL_and_DP.fl_related_funtion.local_clients_train_process import local_clients_train_process_without_dp
+from FL_and_DP.fl_related_funtion.local_clients_train_process import local_clients_train_process_without_dp_one_epoch
 from FL_and_DP.fl_related_funtion.send_main_model_to_clients import send_main_model_to_clients
 from data.fed_data_distribution.dirichlet_nonIID_data import fed_dataset_NonIID_Dirichlet
 from FL_and_DP.fl_related_funtion.optimizier_and_model_distribution import create_model_optimizer_criterion_dict
@@ -11,17 +11,10 @@ import torch
 def fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpoch,iters,alpha,seed,q):
 
     #客户端的样本分配
-    clients_data_list, weight_of_each_clients  = fed_dataset_NonIID_Dirichlet(train_data,number_of_clients,alpha,seed)
-
+    clients_data_list, weight_of_each_clients,batch_size_of_each_clients = fed_dataset_NonIID_Dirichlet(train_data,number_of_clients,alpha,seed,q)
     # # 获取各个客户端的model,optimizer,criterion的组合字典
     clients_model_list, clients_optimizer_list, clients_criterion_list = create_model_optimizer_criterion_dict(number_of_clients, learning_rate,
                                                                                        momentum)
-    # #
-    # # # 获取字典联邦客户端的字典序号
-    # # name_of_x_train_sets, name_of_y_train_sets, name_of_x_valid_sets, name_of_y_valid_sets, name_of_x_test_sets, name_of_y_test_sets, name_of_models, name_of_optimizers, name_of_criterions \
-    # #     = dict_key(x_train_dict, y_train_dict, x_valid_dict, y_valid_dict, x_test_dict, y_test_dict, model_dict,
-    # #                optimizer_dict, criterion_dict)
-    # #
 
     # 初始化中心模型,本质上是用来接收客户端的模型并加权平均进行更新的一个变量
     center_model = CNN()
@@ -40,7 +33,7 @@ def fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpo
         model_dict = send_main_model_to_clients(center_model, clients_model_list,number_of_clients)
 
         # 2本地梯度下降
-        local_clients_train_process_without_dp(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q)
+        local_clients_train_process_without_dp_one_epoch(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q)
 
         # 3 客户端上传参数到中心方进行加权平均并更新中心方参数(根据客户端数量加权平均)
         main_model = set_averaged_weights_as_main_model_weights(center_model,clients_model_list,number_of_clients,weight_of_each_clients)
@@ -62,5 +55,5 @@ if __name__=="__main__":
     iters=100
     alpha=0.05 #狄立克雷的异质参数
     seed=1   #狄立克雷的随机种子
-    q_for_batch_size=0.05   #基于该数据采样率组建每个客户端的batchsize
+    q_for_batch_size=1.0  #基于该数据采样率组建每个客户端的batchsize
     fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpoch,iters,alpha,seed,q_for_batch_size)

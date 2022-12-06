@@ -70,5 +70,5 @@ print("eps:",format(eps)+"| order:",format(opt_order))
 #注意下面的采样率
 if __name__=="__main__":
     orders = (list(range(2, 64)) + [128, 256, 512])  # 默认的lamda
-    eps, opt_order = apply_dp_sgd_analysis(1024 / 50000, 1.54, 10000, orders, 10 ** (-5))
+    eps, opt_order = apply_dp_sgd_analysis(500 / 50000, 1.1, 1000, orders, 10 ** (-5))
     print("eps:", format(eps) + "| order:", format(opt_order))

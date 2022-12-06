@@ -5,7 +5,6 @@ from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 
 #无加噪的中心化学习
-from data.data_load.data_load_Mnist import dataload_mnist_60000
 from data.get_data import get_data
 from model.CNN import CNN, Cifar10CNN, CIFAR10_CNN
 from data.util.sampling import get_data_loaders_uniform_without_replace
@@ -27,7 +26,6 @@ def centralization_train(train_data, test_data, batch_size, model, numEpoch, lea
 
     test_dl = torch.utils.data.DataLoader(
         test_data, batch_size=batch_size, shuffle=False)
-    print("train_dl:", train_dl.__dict__)
 
     print("------ Centralized Model ------")
     for epoch in range(numEpoch):

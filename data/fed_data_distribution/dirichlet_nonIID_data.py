@@ -1,7 +1,12 @@
+import math
+
 import numpy as np
-from torch.utils.data import DataLoader
+import torch
+from torch.utils.data import DataLoader, TensorDataset
 
 
+#《Federated Learning on Non-IID Data Silos: An Experimental Study》
+#按Dirichlet分布划分Non-IID数据集：https://zhuanlan.zhihu.com/p/468992765
 def dirichlet_split_noniid(train_labels, alpha, n_clients, seed):
     '''
     参数为alpha的Dirichlet分布将数据索引划分为n_clients个子集
@@ -48,39 +53,23 @@ def create_Non_iid_subsamples_dirichlet(n_clients, alpha, seed, data):
 
     for i in range(n_clients):
         indices = np.sort(client_idcs[i])
-        data_info = DataLoader(data, sampler=indices)
+        indices=torch.tensor(indices)
+
+        imgae=torch.index_select(data.data,0,indices)
+        imgae=torch.unsqueeze(imgae,1)       #在1的位置增加一维
+        targets=torch.index_select(data.targets,0,indices)
+        data_info=TensorDataset(imgae,targets)
+
         clients_data_list.append(data_info)
 
     return clients_data_list
 
-def fed_dataset_NonIID_Dirichlet(train_data, n_clients, alpha, seed):
+def fed_dataset_NonIID_Dirichlet(train_data, n_clients, alpha, seed,q):
     """
     按Dirichlet分布划分Non-IID数据集，来源：https://zhuanlan.zhihu.com/p/468992765
     x是样本，y是标签
     :return:
     """
-    # #调用create_Non_iid_subsamples_dirichlet拿到每个客户端的训练样本字典
-    # client_data_dict = create_Non_iid_subsamples_dirichlet(n_clients=n_clients, alpha=alpha, seed=seed,data=train_data)
-    # # 要把每个客户端的权重也返回去，后面做加权平均用
-    # number_of_data_on_each_clients = [len(client_data_dict[key]) for key in client_data_dict.keys()]
-    # total_data_length = sum(number_of_data_on_each_clients)
-    # weight_of_each_clients = [x / total_data_length for x in number_of_data_on_each_clients]
-    #
-    #
-    # print("··········让我康康y_trian_dict···········")
-    # for key in client_data_dict.keys():
-    #     print(key, len(client_data_dict[key]))
-    #     lst = []
-    #     for data, target in client_data_dict[key]:
-    #         lst.append(target)
-    #     for i in range(10):
-    #         print(lst.count(i), end=' ')
-    #     #print(len(client_data_dict[key].dataset.targets))
-    #     print()
-    # print("··········让我康康weight_of_each_clients···········")
-    #
-    # print(weight_of_each_clients) #权重打印
-
 
     #调用create_Non_iid_subsamples_dirichlet拿到每个客户端的训练样本字典
     clients_data_list = create_Non_iid_subsamples_dirichlet(n_clients=n_clients, alpha=alpha, seed=seed,data=train_data)
@@ -95,7 +84,9 @@ def fed_dataset_NonIID_Dirichlet(train_data, n_clients, alpha, seed):
         print(i, len(clients_data_list[i]))
         lst = []
         for data, target in clients_data_list[i]:
-            lst.append(target)
+            #print("target:",target)
+            lst.append(target.item())
+
         for i in range(10):     #0-9是标签，这个需要根据不同的数据集来打印，mnist和fashionmnist是只有0-9的标签
             print(lst.count(i), end=' ')
         #print(len(client_data_dict[key].dataset.targets))
@@ -104,5 +95,6 @@ def fed_dataset_NonIID_Dirichlet(train_data, n_clients, alpha, seed):
 
     print(weight_of_each_clients) #权重打印
 
+    batch_size_of_each_clients=[ math.floor(len(clients_data_list[i]) * q) for i in range(len(clients_data_list))]
 
-    return clients_data_list, weight_of_each_clients
+    return clients_data_list, weight_of_each_clients,batch_size_of_each_clients

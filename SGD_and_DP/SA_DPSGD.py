@@ -19,6 +19,7 @@ from scipy.stats import bernoulli
 import numpy as np
 
 
+#文章《SA-DPSGD: Differentially Private Stochastic Gradient Descent based on Simulated Annealin》
 def centralization_train_dynamic_add_noise_SimulatedAnnealing(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma,k,mu_0):
 
 
