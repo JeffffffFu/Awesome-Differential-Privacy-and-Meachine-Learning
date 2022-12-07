@@ -138,7 +138,7 @@ TO DO
 | :------------| :------ | :---------- | :----------------------- 
 | Learning differentially private recurrent language models | H. B. McMahan |  Learning/2017 |首次提出了DP-FedAvg和DP-FedSGD，采样是对客户端进行采样，加噪在中心方。敏感度的计算基于采样率，每个client的联邦权重得到。[【vedio】](https://www.bilibili.com/video/BV1fd4y1A7LD?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
 |Differentially private federated learning: A client level perspective| R. C. Geyer | Cryptography and Security/2017 | 和DP-FedAvg的区别在于客户端上传的模型在中心方进行裁剪，这样就可以进行自适应的裁剪操作（比如取各个客户端模型的范数中值作为裁剪范数）| 
-| Federated f-Differential Privacy | University of Pennsylvania | AISTATS/2021 | 样本级的差分隐私保护，提出了强联邦和弱联邦（个人认为弱联邦没什么意义），隐私度量采用GDP| 
+| Federated Learning with Differential Privacy: Algorithms and Performance Analysis | Nanjing University of Science and Technology | IEEE Transactions on Information Forensics and Security/2019 | 先进行上行链路的隐私保护，然后再基于上行链路的加噪再对下行链路进行加噪，给出了收敛性分析。本篇论文虽然在本地模型加噪，但是敏感度的选择是基于客户端数量，属于client-level| 
 
 #### sample-Level
 保护客户端下样本的参与信息，每个客户端下的样本看成一个数据，将联邦中心方看成敌手
@@ -148,9 +148,7 @@ TO DO
 | Differentially Private Federated Learning on Heterogeneous Data | France Institut Polytechnique de Paris | AISTATS/2022 | 基于Non-IID，在原有的联邦算法SCAFFOLD的基础上加上DP形成DP-SCAFFOLD算法| 
 | DP-FL: a novel differentially private federated learning framework for the unbalanced data| Xixi Huang | World Wide Web/2020 | 将DPAGD-CNN算法集合联邦机器学习，DPAGD-CNN是集中式机器学习下差分隐私预算的自适应分配算法| 
 | Federated f-Differential Privacy | University of Pennsylvania | AISTATS/2021 | 样本级的差分隐私保护，提出了强联邦和弱联邦（个人认为弱联邦没什么意义），隐私度量采用GDP| 
-| User-Level Privacy-Preserving Federated Learning: Analysis and Performance Optimization | Nanjing University of Science and Technology | IEEE Transactions on Mobile Computing /2021 | 在客户端采样而不是客户端中的样本采样，但同样套用了MA的隐私度量方式（合理性存疑），后面加了一个基于隐私预算自适应最优迭代次数的方法，其实就是变相的自适应隐私预算分配。本篇论文是逐样本裁剪，且敏感度的选择看起来是simple-level[【vedio】](https://www.bilibili.com/video/BV16A4y1X74k?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
-| Federated Learning with Differential Privacy: Algorithms and Performance Analysis | Nanjing University of Science and Technology | IEEE Transactions on Information Forensics and Security/2019 | 先进行上行链路的隐私保护，然后再基于上行链路的加噪再对下行链路进行加噪，给出了收敛性分析。本篇论文虽然在本地模型加噪，但是敏感度的选择是基于客户端数量，属于client-level| 
-
+| User-Level Privacy-Preserving Federated Learning: Analysis and Performance Optimization | Nanjing University of Science and Technology | IEEE Transactions on Mobile Computing /2021 | 在客户端采样而不是客户端中的样本采样，但同样套用了MA的隐私度量方式（合理性存疑），后面加了一个基于隐私预算自适应最优迭代次数的方法，其实就是变相的自适应隐私预算分配。本篇论文是逐样本裁剪，且敏感度的选择看起来是simple-level[【vedio】](https://www.bilibili.com/video/BV16A4y1X74k?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)|
 | Adap DP-FL: Differentially Private Federated Learning with Adaptive Noise  | Jie Fu | Trustcom/2022 | 主要是两个自适应点，一个是不同客户端不同轮的自适应裁剪范数，一个是不同轮的自适应噪声系数衰减。| 
 | DPAUC: Differentially Private AUC Computation in Federated Learning  | Jiankai Sun | 2022 | 作者举了一个联邦下客户端模型根据本地测试集进行性能评测算出AUC给中心方的场景，该场景认为AUC（ROC curve）会泄露客户端本地测试集隐私信息，故在传给中心方相关FP和FN等数值上加拉普拉斯噪声进行隐私保护。| 
 #### LDP-FL
