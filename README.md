@@ -17,6 +17,9 @@ bilibili（论文分享）:https://space.bilibili.com/80356866/dynamic
       - [ZCDP](#zcdp)
       - [GDP](#gdp)
       - [Bayesian DP](#Bayesian-DP)
+    - [Privacy Amplification Technology](#Privacy Amplification Technology)
+      - [Sampling](#samlping)
+      - [Shuffle](#shuffle)
   - [DP and Meachine Learning](#dp-and-meachine-learning)  
     - [Meachine Leaning](#meachine-learning)
     - [Meachine Leaning with DP](#meachine-learning-with-dp)
@@ -33,6 +36,7 @@ bilibili（论文分享）:https://space.bilibili.com/80356866/dynamic
     - [Text Protection](#text-protection)
     - [Recommended System](#recommended-system)
     - [DP and image](#dp-and-image)
+    - [DP and cypto](#dp-and-cytro)
 
 
 ## DP Theory
@@ -58,6 +62,12 @@ CDP（central DP）有一个完全可信的中心方，敌手是外界。而LDP�
 
 #### DP
 其中分为严格的差分隐私和松弛的差分隐私，DP隐私损失度量可以查阅上面的CDP相关文献。
+| Title | Team/Main Author | Venue and Year | Key Description 
+| :------------| :------ | :---------- | :----------------------- 
+| Differential privacy | Cynthia Dwork | ICALP/2006 | 首次提出差分隐私的定义 | 
+| Programming Differential Privacy （Book）| Joseph P. Near and Chiké Abuah | 2021 | 讲诉了DP的概念定理和机制等，并附有简单代码呈现（简单入门推荐） | 
+| The Algorithmic Foundations of Differential Privacy（Book） | Cynthia Dwork | 2014 | DP的定义理论，高级组合和相关机制等的完整证明推导（更加理论）[【拉普拉斯、严格差分、高斯机制、松弛差分】](https://www.bilibili.com/video/BV18r4y1j7Bs?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3) |
+| Differential Privacy From Theory to Practice （Book）| Ninghui Li | 2014 | 除了一些基本定理和机制，用了具体的实际例子讲诉了DP的用法及DP的伦理探讨（更加实用化）[【Chapter1、Chapter2】](https://www.bilibili.com/video/BV1br4y1J7Qn?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3),[原作者讲解]()|
 
 #### RDP(MA)
 此前的MA（monments accountant）目前来看就是RDP，区别在于RDP从一开始的散度就用了高阶矩进行度量，而MA是在分布上进行高阶矩度量，不过最后的表达形式几乎一致，两者思想也一致。
@@ -67,14 +77,13 @@ CDP（central DP）有一个完全可信的中心方，敌手是外界。而LDP�
 | Rényi Differential Privacy | Ilya Mironov |  Security Foundations Symposium/2017 | Rényi 差分隐私的定义、性质和结论。主要关注里面的高斯机制（无下采样），组合性质及转为DP的公式。[【vedio】](https://www.bilibili.com/video/BV1YF411L7xV?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3) | 
 | Subsampled Rényi Differential Privacy and Analytical Moments Accountant | Yu-Xiang Wang | AISTATS /2018 | RDP和MA的直观对比，主要给出了一个RDP高斯下采样的一个隐私损失上界，有很多论文引用这个上界的结论。 | 
 | Rényi Differential Privacy of the Sampled Gaussian Mechanism | Ilya Mironov | 2019 | 给出了Rényi Differential Privacy of the Sampled Gaussian Mechanism 各种情况的隐私损失公式，里面的3.3的公式目前应用于各个开源库的隐私计算中（更为简洁） |
-| Hypothesis Testing Interpretations and Rényi Differential Privacy | Balle B | AISTATS/2020 | 定理21给出了更为紧凑的RDP转DP的公式（目前开源库opacus应用的是这个转换） |
+| Hypothesis Testing Interpretations and Rényi Differential Privacy | Balle B | AISTATS/2020 | 定理21给出了更为紧凑的RDP转DP的公式（目前开源库opacus应用的是这个转换）  | 
 
 #### ZCDP
 | Title | Team/Main Author | Venue and Year | Key Description                                                                                                                                                         
 | :------------| :------ | :---------- |:------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Concentrated Differential Privacy: Simplifications, Extensions, and Lower Bounds | UMark Bun | 2016 | 提出ZCDP的定义及ZCDP和DP的关系（ZCDP也是从瑞丽散度来定义的）。不过和RDP不同的是，ZCDP的$\alpha\in(1,+\infty)$，如果细致的选择$\alpha$，RDP的计算出的隐私损失要小于ZCDP。[RDP与ZCDP对比参考](https://zhuanlan.zhihu.com/p/457972991) | 
 | Differentially Private Model Publishing for Deep Learning | Gatech | SP/2019| 提出了ZCDP的采样和随机排列机制                                                                                                                                                       | 
-
 
 #### GDP
 | Title | Team/Main Author | Venue and Year | Key Description 
@@ -88,7 +97,19 @@ CDP（central DP）有一个完全可信的中心方，敌手是外界。而LDP�
 TO DO
 
 《Data-Aware Privacy-Preserving Machine Learning》
+### Privacy Amplification Technology
 
+#### samlping
+| Title                                                                                                | Team/Main Author | Venue and Year | Key Description                                                                                             
+|:-----------------------------------------------------------------------------------------------------|:-----------------|:---------------|:------------------------------------------------------------------------------------------------------------
+| On Sampling, Anonymization, and Differential Privacy: Or, k-Anonymization Meets Differential Privacy | Purdue University       | 2011           | 给出了最原始的采样隐私预算公式和证明                                                                                          |
+| Rényi Differential Privacy of the Sampled Gaussian Mechanism                                         | Ilya Mironov     | 2019           | 给出了Rényi Differential Privacy of the Sampled Gaussian Mechanism 各种情况的隐私损失公式，里面的3.3的公式目前应用于各个开源库的隐私计算中（更为简洁） |
+
+#### shuffle
+| Title | Team/Main Author | Venue and Year | Key Description 
+| :------------| :------ | :---------- | :----------------------- 
+| The Privacy Blanket of the Shuffle Model | Borja Balle  | 2019 | 最为经典的shuffle证明。首先指出，对于shuffle模型，整个shuffle中的数据集应当看成整体，从而才有相邻数据集，针对这个数据集整体满足差分隐私。其次，采用数据相关和数据无关将整体数据分割成两部分，最大化敌手，使得最后只需要分析数据无关的部分，即隐私毯子，随机性在隐私毯子中。[【vedio】](https://www.bilibili.com/video/BV14W4y1b7VK?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)
+| Hiding Among the Clones: A Simple and Nearly Optimal Analysis of Privacy Amplification by Shuffling | Vitaly Feldman  | 2020 | 和隐私毯子类似的证明思想，不过假设的敌手知道的背景知识没有隐私毯子那么全面，每一个扰动的输出都会影响隐私性。在数据相关部分，进一步分成p/2和p/2进行分析。得到的隐私界比隐私毯子更紧凑。
 
 ## DP and Meachine Learning
 本章集中在如何进行更高效机器学习集合差分隐私训练
