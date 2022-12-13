@@ -44,14 +44,14 @@ def set_averaged_weights_as_main_model_weights_fully_averaged(center_model,clien
             if sum_parameters is None:  # 先初始化模型字典，主要是初始化key
                 sum_parameters = {}
                 for key, var in local_parameters.items():
-                    sum_parameters[key] = (1/len(clients_model_list)) * var.clone()
+                    sum_parameters[key] = var.clone()
 
             else:  # 然后做值的累加,这边直接加权了
                 for var in sum_parameters:
-                    sum_parameters[var] = sum_parameters[var] +  (1/len(clients_model_list)) * local_parameters[var]
+                    sum_parameters[var] = sum_parameters[var] +  local_parameters[var]
 
         for var in global_parameters:
-            global_parameters[var] = (sum_parameters[var])
+            global_parameters[var] = (sum_parameters[var] / len(clients_model_list))
 
     center_model.load_state_dict(global_parameters, strict=True)
     return center_model

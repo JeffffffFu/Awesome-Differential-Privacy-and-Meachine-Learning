@@ -10,10 +10,10 @@ def train(model, train_loader, criterion, optimizer):
     i=0
 
     for data, target in train_loader:  # batch之前组装到data数据集里的,pytorch的MBDG统一用这种方式进行,会按序列一个个btach训练
-
+        # print("data:",data.shape)
         output = model(data.to(torch.float32))  # 计算输出
         loss = criterion(output, target.to(torch.long))  # 损失函数
-        optimizer.zero_grad()  # 梯度情况
+        optimizer.zero_grad()  # 梯度清空
         loss.backward()  # 梯度求导
         optimizer.step()  # 参数优化更新
 
