@@ -26,6 +26,8 @@ def fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpo
         test_data, batch_size=batch_size, shuffle=False)
 
     print("联邦学习整体流程开始-------------------")
+    test_accuracy_record=[]
+    test_loss_record=[]
 
     for i in range(iters):
 
@@ -43,6 +45,12 @@ def fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpo
         test_loss, test_accuracy = validation(center_model, test_dl)
         print("Iteration", str(i + 1), ": main_model accuracy on all test data: {:7.4f}".format(test_accuracy))
 
+        test_loss_record.append(test_loss)
+        test_accuracy_record.append(test_accuracy)
+
+    record=[iters,numEpoch,test_loss_record,test_accuracy_record]
+
+    torch.save(record, "../record/{}.pth".format(int(numEpoch)))
 
 if __name__=="__main__":
     train_data, test_data = get_data('mnist', augment=False)
@@ -57,4 +65,7 @@ if __name__=="__main__":
     alpha=0.05 #狄立克雷的异质参数
     seed=1   #随机种子
     q_for_batch_size=0.1  #基于该数据采样率组建每个客户端的batchsize
-    fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpoch,iters,alpha,seed,q_for_batch_size)
+    numEpoch_list=[1,5,10,20,50,100]
+    for numEpoch in numEpoch_list:
+         iters=int(iters/numEpoch)
+         fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpoch,iters,alpha,seed,q_for_batch_size)
