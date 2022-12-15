@@ -45,7 +45,7 @@ def fed_avg_with_dp_sample_level(train_data,test_data,number_of_clients,learning
         print("现在进行和中心方的第{:3.0f}轮联邦训练".format(i+1))
 
         # 1 中心方广播参数给各个客户端
-        model_dict = send_main_model_to_clients(center_model, clients_model_list,number_of_clients)
+        model_dict = send_main_model_to_clients(center_model, clients_model_list)
 
         # 2本地梯度下降需要加噪
         local_clients_train_process_with_dp(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q)
@@ -59,7 +59,7 @@ def fed_avg_with_dp_sample_level(train_data,test_data,number_of_clients,learning
         # 3 客户端上传参数到中心方进行加权平均并更新中心方参数(根据客户端数量加权平均)
        # main_model = set_averaged_weights_as_main_model_weights(center_model,clients_model_list,number_of_clients,weight_of_each_clients)
 
-        main_model = set_averaged_weights_as_main_model_weights_fully_averaged(center_model,clients_model_list,number_of_clients,weight_of_each_clients)
+        main_model = set_averaged_weights_as_main_model_weights_fully_averaged(center_model,clients_model_list,weight_of_each_clients)
 
 
         # 查看效果中心方模型效果

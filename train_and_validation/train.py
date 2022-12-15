@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 from torch.utils.data import TensorDataset
+import pylab
+import matplotlib.pyplot as plt
 
 
 #MBSGD 小批量梯度下降 , 这个train_loader里面是有多个batch的
@@ -11,6 +13,11 @@ def train(model, train_loader, criterion, optimizer):
 
     for data, target in train_loader:  # batch之前组装到data数据集里的,pytorch的MBDG统一用这种方式进行,会按序列一个个btach训练
         # print("data:",data.shape)
+        # print("traget",target[0])
+        # img_x = data[0].reshape(28, 28)
+        # plt.imshow(img_x)
+        # plt.show()
+
         output = model(data.to(torch.float32))  # 计算输出
         loss = criterion(output, target.to(torch.long))  # 损失函数
         optimizer.zero_grad()  # 梯度清空

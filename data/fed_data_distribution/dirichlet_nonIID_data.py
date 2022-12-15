@@ -43,24 +43,28 @@ def create_Non_iid_subsamples_dirichlet(n_clients, alpha, seed, train_data):
     """
 
     # 这里返回的是一个二维list，每个二级list装了对应下标的client分配到的数据的索引
-    y_data=train_data.targets    #得到全部样本的标签
+    train_labels=train_data.targets    #得到全部样本的标签
 
-    client_idcs = dirichlet_split_noniid(train_labels=y_data, alpha=alpha, n_clients=n_clients, seed=seed)
+    client_idcs = dirichlet_split_noniid(train_labels, alpha, n_clients, seed)
 
     clients_data_list=[]
+
 
 
     for i in range(n_clients):
         indices = np.sort(client_idcs[i])
         indices=torch.tensor(indices)
 
-        imgae=torch.index_select(train_data.data,0,indices)
+        data=train_data.data / 255.0
+        imgae=torch.index_select(data,0,indices)
         imgae=torch.unsqueeze(imgae,1)       #在1的位置增加一维
-        targets=torch.index_select(train_data.targets,0,indices)
-        data_info=TensorDataset(imgae,targets)
 
+        targets=torch.index_select(train_labels,0,indices)
+        data_info=TensorDataset(imgae,targets)
         clients_data_list.append(data_info)
 
+    print("注意查看训练集的data的数据类型是不是0-255的无符号整型")
+    # print("clients_data_list:",clients_data_list[1][1])
     return clients_data_list
 
 def fed_dataset_NonIID_Dirichlet(train_data, n_clients, alpha, seed,q):
@@ -71,7 +75,7 @@ def fed_dataset_NonIID_Dirichlet(train_data, n_clients, alpha, seed,q):
     """
 
     #调用create_Non_iid_subsamples_dirichlet拿到每个客户端的训练样本字典
-    clients_data_list = create_Non_iid_subsamples_dirichlet(n_clients=n_clients, alpha=alpha, seed=seed,data=train_data)
+    clients_data_list = create_Non_iid_subsamples_dirichlet(n_clients, alpha, seed,train_data)
     # 要把每个客户端的权重也返回去，后面做加权平均用
     number_of_data_on_each_clients = [len(clients_data_list[i]) for i in range(len(clients_data_list))]
     total_data_length = sum(number_of_data_on_each_clients)

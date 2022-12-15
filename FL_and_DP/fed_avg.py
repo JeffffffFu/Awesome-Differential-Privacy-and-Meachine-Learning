@@ -14,18 +14,17 @@ import torch
 def fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpoch,iters,alpha,seed,q):
 
     #客户端的样本分配
-    clients_data_list, weight_of_each_clients,batch_size_of_each_clients =pathological_split_noniid(train_data,number_of_clients,alpha,seed,q)
+    clients_data_list, weight_of_each_clients,batch_size_of_each_clients =fed_dataset_NonIID_Dirichlet(train_data,number_of_clients,alpha,seed,q)
 
     # 各个客户端的model,optimizer,criterion的分配
-    clients_model_list, clients_optimizer_list, clients_criterion_list = create_model_optimizer_criterion_dict(number_of_clients, learning_rate,
-                                                                                       momentum)
+    clients_model_list, clients_optimizer_list, clients_criterion_list = create_model_optimizer_criterion_dict(number_of_clients, learning_rate,momentum)
 
     # 初始化中心模型,本质上是用来接收客户端的模型并加权平均进行更新的一个变量
     center_model = CNN()
 
     test_dl = torch.utils.data.DataLoader(
         test_data, batch_size=batch_size, shuffle=False)
-    
+
     print("联邦学习整体流程开始-------------------")
 
     for i in range(iters):
@@ -33,13 +32,12 @@ def fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpo
         print("现在进行和中心方的第{:3.0f}轮联邦训练".format(i+1))
 
         # 1 中心方广播参数给各个客户端
-        clients_model_list = send_main_model_to_clients(center_model, clients_model_list,number_of_clients)
-
+        clients_model_list = send_main_model_to_clients(center_model, clients_model_list)
         # 2本地梯度下降
         local_clients_train_process_without_dp_one_batch(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q)
 
         # 3 客户端上传参数到中心方进行加权平均并更新中心方参数(根据客户端数量加权平均)
-        center_model = set_averaged_weights_as_main_model_weights_fully_averaged(center_model,clients_model_list,number_of_clients,weight_of_each_clients)
+        center_model = set_averaged_weights_as_main_model_weights(center_model,clients_model_list,weight_of_each_clients)
 
         # 查看效果中心方模型效果
         test_loss, test_accuracy = validation(center_model, test_dl)
@@ -58,5 +56,5 @@ if __name__=="__main__":
     iters=1000
     alpha=0.05 #狄立克雷的异质参数
     seed=1   #随机种子
-    q_for_batch_size=1.0  #基于该数据采样率组建每个客户端的batchsize
+    q_for_batch_size=0.1  #基于该数据采样率组建每个客户端的batchsize
     fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpoch,iters,alpha,seed,q_for_batch_size)

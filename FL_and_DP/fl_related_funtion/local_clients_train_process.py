@@ -47,11 +47,9 @@ def local_clients_train_process_without_dp_one_batch(number_of_clients,clients_d
 
     # 循环客户端
     for i in range(number_of_clients):
-
         batch_size=math.floor(len(clients_data_list[i])*q)
-        batch_size=256
         # 包装抽样函数
-        minibatch_size = batch_size  # 这里比较好的取值是根号n，n为每个客户端的样本数
+        minibatch_size = batch_size
         microbatch_size = 1  # 这里默认1就好
         iterations = 1  # n个batch，这边就定一个，每次训练采样一个Lot
         minibatch_loader, microbatch_loader = get_data_loaders_uniform_without_replace(minibatch_size, microbatch_size,
@@ -60,7 +58,7 @@ def local_clients_train_process_without_dp_one_batch(number_of_clients,clients_d
         model = clients_model_list[i]
         criterion = clients_criterion_list[i]
         optimizer = clients_optimizer_list[i]
-
+        # print("clients_data_list:",clients_data_list[i][1] )
         # if i < number_of_clients:
         #     print("Client:", i)
 

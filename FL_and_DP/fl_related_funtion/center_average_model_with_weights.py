@@ -1,7 +1,7 @@
 import torch
 
 
-def set_averaged_weights_as_main_model_weights(center_model,clients_model_list,number_of_clients,weight_of_each_clients):
+def set_averaged_weights_as_main_model_weights(center_model,clients_model_list,weight_of_each_clients):
     sum_parameters = None  # 用来接所有边缘节点的模型的参数
     global_parameters = {}
     for key, var in center_model.state_dict().items():
@@ -9,7 +9,7 @@ def set_averaged_weights_as_main_model_weights(center_model,clients_model_list,n
 
     with torch.no_grad():
 
-        for i in range(number_of_clients):
+        for i in range(len(clients_model_list)):
 
             local_parameters = clients_model_list[i].state_dict()  # 先把第i个客户端的model取出来
 
@@ -29,7 +29,7 @@ def set_averaged_weights_as_main_model_weights(center_model,clients_model_list,n
     return center_model
 
 #简单的平均，不做加权
-def set_averaged_weights_as_main_model_weights_fully_averaged(center_model,clients_model_list,number_of_clients,weight_of_each_clients):
+def set_averaged_weights_as_main_model_weights_fully_averaged(center_model,clients_model_list,weight_of_each_clients):
     sum_parameters = None  # 用来接所有边缘节点的模型的参数
     global_parameters = {}
     for key, var in center_model.state_dict().items():
@@ -37,7 +37,7 @@ def set_averaged_weights_as_main_model_weights_fully_averaged(center_model,clien
 
     with torch.no_grad():
 
-        for i in range(number_of_clients):
+        for i in range(len(clients_model_list)):
 
             local_parameters = clients_model_list[i].state_dict()  # 先把第i个客户端的model取出来
 
