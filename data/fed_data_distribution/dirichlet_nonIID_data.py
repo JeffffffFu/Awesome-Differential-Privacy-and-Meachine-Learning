@@ -64,7 +64,7 @@ def create_Non_iid_subsamples_dirichlet(n_clients, alpha, seed, train_data):
         clients_data_list.append(data_info)
 
     print("注意查看训练集的data的数据类型是不是0-255的无符号整型")
-    # print("clients_data_list:",clients_data_list[1][1])
+    #print("clients_data_list:",clients_data_list[1][1])
     return clients_data_list
 
 def fed_dataset_NonIID_Dirichlet(train_data, n_clients, alpha, seed,q):

@@ -27,17 +27,17 @@ def train_dynamic_add_noise(model, train_loader, criterion, optimizer):
             loss = criterion(output, torch.unsqueeze(y_microbatch, 0))
 
             loss.backward()         #梯度求导，这边求出梯度
-            optimizer.microbatch_step()  # 这个step做的是每个样本的梯度裁剪和梯度累加的操作
-
-        optimizer.step()  # 这个做的是梯度加噪和梯度平均更新下降的操作
+            norm=optimizer.microbatch_step()  # 这个step做的是每个样本的梯度裁剪和梯度累加的操作
+            # print("norm:",norm)
+        optimizer.step_dp()  # 这个做的是梯度加噪和梯度平均更新下降的操作
 
         #训练集测试损失值和准确率
-        train_output=model(data.to(torch.float32))
-        train_loss=criterion(train_output,target).item()
-        prediction = train_output.argmax(dim=1, keepdim=True)  # 将one-hot输出转为单个标量
-        correct = prediction.eq(target.view_as(prediction)).sum().item()  # 比较得到准确率
-        train_acc=100. * correct/len(data)
-        i+=1
+        # train_output=model(data.to(torch.float32))
+        # train_loss=criterion(train_output,target).item()
+        # prediction = train_output.argmax(dim=1, keepdim=True)  # 将one-hot输出转为单个标量
+        # correct = prediction.eq(target.view_as(prediction)).sum().item()  # 比较得到准确率
+        # train_acc=100. * correct/len(data)
+        # i+=1
 
         # print(f'batch: {i}, 'f'Train set: loss: {train_loss:.4f}, '
         #       f'Accuracy: {correct}/{len(data)} ({train_acc:.2f}%)')

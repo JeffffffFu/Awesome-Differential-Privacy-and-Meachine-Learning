@@ -1,12 +1,12 @@
 import math
 
-from FL_and_DP.fl_related_funtion.center_average_model_with_weights import set_averaged_weights_as_main_model_weights, \
+from FL_and_DP.fl_utils.center_average_model_with_weights import set_averaged_weights_as_main_model_weights, \
     set_averaged_weights_as_main_model_weights_fully_averaged
-from FL_and_DP.fl_related_funtion.local_clients_train_process import local_clients_train_process_without_dp, \
-    local_clients_train_process_with_dp
-from FL_and_DP.fl_related_funtion.send_main_model_to_clients import send_main_model_to_clients
+from FL_and_DP.fl_utils.local_clients_train_process import local_clients_train_process_with_dp_one_epoch, \
+    local_clients_train_process_with_dp_one_batch
+from FL_and_DP.fl_utils.send_main_model_to_clients import send_main_model_to_clients
 from data.fed_data_distribution.dirichlet_nonIID_data import fed_dataset_NonIID_Dirichlet
-from FL_and_DP.fl_related_funtion.optimizier_and_model_distribution import create_model_optimizer_criterion_dict, \
+from FL_and_DP.fl_utils.optimizier_and_model_distribution import create_model_optimizer_criterion_dict, \
     create_model_optimizer_criterion_dict_with_dp_optimizer
 from data.get_data import get_data
 from model.CNN import CNN
@@ -48,7 +48,7 @@ def fed_avg_with_dp_sample_level(train_data,test_data,number_of_clients,learning
         model_dict = send_main_model_to_clients(center_model, clients_model_list)
 
         # 2本地梯度下降需要加噪
-        local_clients_train_process_with_dp(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q)
+        local_clients_train_process_with_dp_one_epoch(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q)
 
         #这边计算rdp的次数，一个是看多少个epoch,一个是看一个epoch里面做了多少次batch的迭代，这边应该是1/q向下取整，因为我们在组装datasize的时候会trop_out
         rdp += compute_rdp(q, sigma, numEpoch*math.floor(1/q), orders)
@@ -59,12 +59,13 @@ def fed_avg_with_dp_sample_level(train_data,test_data,number_of_clients,learning
         # 3 客户端上传参数到中心方进行加权平均并更新中心方参数(根据客户端数量加权平均)
        # main_model = set_averaged_weights_as_main_model_weights(center_model,clients_model_list,number_of_clients,weight_of_each_clients)
 
-        main_model = set_averaged_weights_as_main_model_weights_fully_averaged(center_model,clients_model_list,weight_of_each_clients)
+        main_model = set_averaged_weights_as_main_model_weights(center_model,clients_model_list,weight_of_each_clients)
 
 
         # 查看效果中心方模型效果
         test_loss, test_accuracy = validation(main_model, test_dl)
-        print("Iteration", str(i + 1), ": main_model accuracy on all test data: {.2f}%".format(test_accuracy))
+        print("Iteration", str(i + 1), ": main_model accuracy on all test data: {:7.4f}".format(test_accuracy))
+
 
 
 def fed_avg_with_dp_sample_level_many_batch(train_data,test_data,number_of_clients,learning_rate,momentum,numEpoch,iters,alpha,seed,q,max_norm,sigma,delta):
@@ -97,7 +98,7 @@ def fed_avg_with_dp_sample_level_many_batch(train_data,test_data,number_of_clien
         model_dict = send_main_model_to_clients(center_model, clients_model_list,number_of_clients)
 
         # 2本地梯度下降需要加噪
-        local_clients_train_process_with_dp(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q)
+        local_clients_train_process_with_dp_one_batch(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q)
 
         #这边计算rdp的次数，一个是看多少个epoch,一个是看一个epoch里面做了多少次batch的迭代，这边应该是1/q向下取整，因为我们在组装datasize的时候会trop_out
         rdp += compute_rdp(q, sigma, numEpoch*math.floor(1/q), orders)
@@ -115,7 +116,7 @@ def fed_avg_with_dp_sample_level_many_batch(train_data,test_data,number_of_clien
 if __name__=="__main__":
     train_data, test_data = get_data('mnist', augment=False)
     model = CNN()
-    batch_size=64
+    batch_size=256
     learning_rate = 0.002
     numEpoch = 1       #客户端本地下降次数
     number_of_clients=10

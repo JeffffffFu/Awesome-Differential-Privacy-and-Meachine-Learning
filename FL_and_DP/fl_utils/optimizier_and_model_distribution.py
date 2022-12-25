@@ -16,7 +16,7 @@ def create_model_optimizer_criterion_dict(number_of_clients, learning_rate, mome
         # model_info = Net2nn()
         clients_model_list.append(model_info)
 
-        optimizer_info = torch.optim.Adam(model_info.parameters(), lr=learning_rate)
+        optimizer_info = torch.optim.SGD(model_info.parameters(), lr=learning_rate)
         clients_optimizer_list.append(optimizer_info)
 
         criterion_info = nn.CrossEntropyLoss()

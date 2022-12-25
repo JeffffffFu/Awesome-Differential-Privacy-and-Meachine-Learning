@@ -1,10 +1,10 @@
-from FL_and_DP.fl_related_funtion.center_average_model_with_weights import set_averaged_weights_as_main_model_weights, \
+from FL_and_DP.fl_utils.center_average_model_with_weights import set_averaged_weights_as_main_model_weights, \
     set_averaged_weights_as_main_model_weights_fully_averaged
-from FL_and_DP.fl_related_funtion.local_clients_train_process import local_clients_train_process_without_dp_one_epoch, \
+from FL_and_DP.fl_utils.local_clients_train_process import local_clients_train_process_without_dp_one_epoch, \
     local_clients_train_process_without_dp_one_batch
-from FL_and_DP.fl_related_funtion.send_main_model_to_clients import send_main_model_to_clients
+from FL_and_DP.fl_utils.send_main_model_to_clients import send_main_model_to_clients
 from data.fed_data_distribution.dirichlet_nonIID_data import fed_dataset_NonIID_Dirichlet
-from FL_and_DP.fl_related_funtion.optimizier_and_model_distribution import create_model_optimizer_criterion_dict
+from FL_and_DP.fl_utils.optimizier_and_model_distribution import create_model_optimizer_criterion_dict
 from data.fed_data_distribution.pathological_nonIID_data import pathological_split_noniid
 from data.get_data import get_data
 from model.CNN import CNN
@@ -57,15 +57,16 @@ if __name__=="__main__":
     model = CNN()
     #print(train_data.__dict__)
     batch_size=64
-    learning_rate = 0.002
+    learning_rate = 0.1
     numEpoch = 1       #客户端本地下降次数
     number_of_clients=10
     momentum=0.9
-    iters=1000
+    iters=200
     alpha=0.05 #狄立克雷的异质参数
     seed=1   #随机种子
     q_for_batch_size=0.1  #基于该数据采样率组建每个客户端的batchsize
-    numEpoch_list=[1,5,10,20,50,100]
+    numEpoch_list=[1,5,10,20,50]
     for numEpoch in numEpoch_list:
-         iters=int(iters/numEpoch)
-         fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpoch,iters,alpha,seed,q_for_batch_size)
+        iters = 200
+        iters=int(iters/numEpoch)
+        fed_avg(train_data,test_data,number_of_clients,learning_rate,momentum,numEpoch,iters,alpha,seed,q_for_batch_size)

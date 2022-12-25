@@ -40,15 +40,11 @@ def make_optimizer_class(cls):
            # print("self:", len(self.param_groups))
             # 范数的计算,遍历一个样本梯度中每个元素
             for group in self.param_groups:  # 整个group里面包含params和accum_grads两个模块，params是每层的张量（正常单元和偏执单元分开）
-              #  print("microbatch_step-group: ", len(group))
                 for param in group['params']:  # param是具体的那个张量（逐层），偏执单元和正常单元的张量分开
-                 #   print("microbatch_step-param: ", param.shape)
-                    if param.requires_grad:  # 如果可导
+                    if param.requires_grad:
                         total_norm += param.grad.data.norm(2).item() ** 2.  #对每层求范数然后把根号开出来，然后对它们求和
 
             total_norm = total_norm ** .5  #最后求和的数再取平方根，完成了单样本梯度范数的计算
-            # print("裁剪toral_norm:",total_norm)
-            # print("self.l2_norm_clip:",self.l2_norm_clip)
             clip_coef = min(self.l2_norm_clip / (total_norm+ 1e-6), 1.)  # 范数比较，得到等下要裁剪的部分
             #clip_coef=1.0      #不裁剪
             # 梯度的裁剪
@@ -61,7 +57,6 @@ def make_optimizer_class(cls):
 
             return total_norm
 
-
        #这个是accum_grad清零
         def zero_accum_grad(self):
             for group in self.param_groups:
@@ -71,7 +66,7 @@ def make_optimizer_class(cls):
 
 
         #这里做的是全部样本相加、加噪然后平均
-        def step(self, *args, **kwargs):
+        def step_dp(self, *args, **kwargs):
             for group in self.param_groups:
                 # print("group: ",group)
                 for param, accum_grad in zip(group['params'],
@@ -83,7 +78,6 @@ def make_optimizer_class(cls):
                         param.grad.data = accum_grad.clone()
 
                         # 对求和的梯度进行加噪。randn_like：返回与输入相同大小的张量，该张量由区间[0,1)上均匀分布的随机数填充。torch.randn_like可以理解为标准正态分布
-
                         param.grad.data.add_(self.l2_norm_clip * self.noise_multiplier * torch.randn_like(param.grad.data))
 
                         # 再除以batch数平均化

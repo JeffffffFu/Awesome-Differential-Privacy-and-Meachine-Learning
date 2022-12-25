@@ -109,24 +109,24 @@ def centralization_train_dynamic_add_noise_SimulatedAnnealing(train_data, test_d
         print("epoch: {:3.0f}".format(epoch + 1) + " | epsilon: {:7.4f}".format(
         epsilon) + " | best_alpha: {:7.4f}".format(best_alpha)  )
 
-        if (epsilon > 3):
-            wb = Workbook()
-            sheet = wb.active
-            sheet.title = "result"
-            sheet.cell(1, 3).value = "acc"
-            sheet.cell(1, 4).value = "eps"
-            sheet.cell(1, 5).value = "sigma"
-            # sheet.cell(1, 6).value="实验时间：{}".format(datetime.datetime.now())
-            sheet.cell(1, 7).value = "| batch_size:{}".format(batch_size) + "| learning_rate:{}".format(
-                learning_rate) + "| sigma:{}".format(sigma) + "| max_norm:{}".format(max_norm) + "| numepoch:{}".format(
-                numEpoch)
-            # sheet.cell(1, 8).value = "mnist数据自适应范数裁剪，不是逐层"
-            for i in range(len(result_loss_list)):
-                sheet.cell(i + 2, 2).value = result_loss_list[i]
-                sheet.cell(i + 2, 3).value = result_acc_list[i]
-                sheet.cell(i + 2, 4).value = epsilon_list[i]
-            wb.save("../result/{}.xlsx".format(int(time.time())))
-            break
+        # if (epsilon > 3):
+        #     wb = Workbook()
+        #     sheet = wb.active
+        #     sheet.title = "result"
+        #     sheet.cell(1, 3).value = "acc"
+        #     sheet.cell(1, 4).value = "eps"
+        #     sheet.cell(1, 5).value = "sigma"
+        #     # sheet.cell(1, 6).value="实验时间：{}".format(datetime.datetime.now())
+        #     sheet.cell(1, 7).value = "| batch_size:{}".format(batch_size) + "| learning_rate:{}".format(
+        #         learning_rate) + "| sigma:{}".format(sigma) + "| max_norm:{}".format(max_norm) + "| numepoch:{}".format(
+        #         numEpoch)
+        #     # sheet.cell(1, 8).value = "mnist数据自适应范数裁剪，不是逐层"
+        #     for i in range(len(result_loss_list)):
+        #         sheet.cell(i + 2, 2).value = result_loss_list[i]
+        #         sheet.cell(i + 2, 3).value = result_acc_list[i]
+        #         sheet.cell(i + 2, 4).value = epsilon_list[i]
+        #     wb.save("../result/{}.xlsx".format(int(time.time())))
+        #     break
 
     print("------ Training finished ------")
 
