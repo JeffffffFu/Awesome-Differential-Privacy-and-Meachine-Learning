@@ -34,7 +34,7 @@ def local_clients_train_process_without_dp_one_epoch(number_of_clients,clients_d
         for epoch in range(numEpoch):  # 每个客户端本地进行训练
 
 
-            train_loss, train_accuracy = train(model, train_dl, criterion, optimizer)
+            train_loss, train_accuracy = train(model, train_dl, optimizer)
             #test_loss, test_accuracy = validation(model, test_dl)  联邦下，这里本地没有合适的测试集了
 
             # if i < number_of_clients:
@@ -66,7 +66,7 @@ def local_clients_train_process_without_dp_one_batch(number_of_clients,clients_d
         for epoch in range(numEpoch):  # 每个客户端本地进行训练
 
             train_dl=minibatch_loader(clients_data_list[i])
-            train_loss, train_accuracy = train(model, train_dl, criterion, optimizer)
+            train_loss, train_accuracy = train(model, train_dl, optimizer)
             #test_loss, test_accuracy = validation(model, test_dl)  联邦下，这里本地没有合适的测试集了
 
             # if i < number_of_clients:
@@ -86,7 +86,6 @@ def local_clients_train_process_with_dp_one_epoch(number_of_clients,clients_data
 
         # 各客户端取到自己对应的模型,损失函数和优化器
         model = clients_model_list[i]
-        criterion = clients_criterion_list[i]
         optimizer = clients_optimizer_list[i]
 
         # if i < number_of_clients:
@@ -95,7 +94,7 @@ def local_clients_train_process_with_dp_one_epoch(number_of_clients,clients_data
 
         for epoch in range(numEpoch):  # 每个客户端本地进行训练
 
-            train_loss, train_accuracy = train_dynamic_add_noise(model, train_dl, criterion, optimizer)
+            train_loss, train_accuracy = train_dynamic_add_noise(model, train_dl, optimizer)
             #test_loss, test_accuracy = validation(model, test_dl)  联邦下，这里本地没有合适的测试集了
 
             # if i < number_of_clients:
@@ -118,7 +117,6 @@ def local_clients_train_process_with_dp_one_batch(number_of_clients,clients_data
                                                                                        iterations)  # 无放回均匀采样
         # 各客户端取到自己对应的模型,损失函数和优化器
         model = clients_model_list[i]
-        criterion = clients_criterion_list[i]
         optimizer = clients_optimizer_list[i]
 
         if i < number_of_clients:
@@ -128,13 +126,14 @@ def local_clients_train_process_with_dp_one_batch(number_of_clients,clients_data
         for epoch in range(numEpoch):  # 每个客户端本地进行训练
 
             train_dl=minibatch_loader(clients_data_list[i])
-            train_loss, train_accuracy = train_dynamic_add_noise(model, train_dl, criterion, optimizer)
+            train_loss, train_accuracy = train_dynamic_add_noise(model, train_dl, optimizer)
             #test_loss, test_accuracy = validation(model, test_dl)  联邦下，这里本地没有合适的测试集了
 
             if i < number_of_clients:
                 print("epoch: {:3.0f}".format(epoch + 1) + " | train_loss: {:7.5f}".format(
                     train_loss) + " | train_accuracy: {:7.5f}".format(train_accuracy))
 
+#本地训练不进行裁剪加噪，最好上传到联邦中心方再进行裁剪加噪
 def local_clients_train_process_one_epoch_with_ldp_gaussian(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q,max_norm,noise_scale):
 
     # 循环客户端
@@ -155,7 +154,7 @@ def local_clients_train_process_one_epoch_with_ldp_gaussian(number_of_clients,cl
         for epoch in range(numEpoch):  # 每个客户端本地进行训练
 
 
-            train_loss, train_accuracy = train(model, train_dl, criterion, optimizer)
+            train_loss, train_accuracy = train(model, train_dl, optimizer)
             #test_loss, test_accuracy = validation(model, test_dl)  联邦下，这里本地没有合适的测试集了
 
             # if i < number_of_clients:

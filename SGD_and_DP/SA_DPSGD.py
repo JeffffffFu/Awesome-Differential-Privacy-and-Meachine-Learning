@@ -29,7 +29,6 @@ def centralization_train_dynamic_add_noise_SimulatedAnnealing(train_data, test_d
         lr=learning_rate,
         # momentum=momentum
     )
-    centralized_criterion = nn.CrossEntropyLoss()
 
     # 包装抽样函数
     minibatch_size = batch_size  # 这里比较好的取值是根号n，n为每个客户端的样本数
@@ -60,7 +59,7 @@ def centralization_train_dynamic_add_noise_SimulatedAnnealing(train_data, test_d
 
         train_dl = minibatch_loader(train_data)     #抽样
 
-        central_train_loss, central_train_accuracy = train_dynamic_add_noise(model, train_dl, centralized_criterion, optimizer)
+        central_train_loss, central_train_accuracy = train_dynamic_add_noise(model, train_dl, optimizer)
 
         central_test_loss, central_test_accuracy = validation(model, test_dl)
 

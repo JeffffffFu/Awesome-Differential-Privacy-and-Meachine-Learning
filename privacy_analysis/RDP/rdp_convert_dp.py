@@ -55,3 +55,53 @@ def compute_eps(orders, rdp, delta):
 
   idx_opt = np.argmin(eps_vec)   #找一个最小的
   return max(0, eps_vec[idx_opt]), orders_vec[idx_opt]
+
+
+# 下面这个是最初的RDP转DP的公式，20年之前很多文章，包括opacus的老版本应该用的是这个
+# Basic bound (see https://arxiv.org/abs/1702.07476 Proposition 3 in v3):
+# #[Mironov, 2017, Propisition 3]是RDP转DP原始的公式，可能不够紧凑
+#   eps = min( rdp_vec - math.log(delta) / (orders_vec - 1) )
+def compute_eps2(orders, rdp, delta):
+  """Compute epsilon given a list of RDP values and target delta.
+  Args:
+    orders: An array (or a scalar) of orders.
+    rdp: A list (or a scalar) of RDP guarantees.
+    delta: The target delta.
+  Returns:
+    Pair of (eps, optimal_order).
+  Raises:
+    ValueError: If input is malformed.
+  """
+  r"""Computes epsilon given a list of Renyi Differential Privacy (RDP) values at
+  multiple RDP orders and target ``delta``.
+
+  Args:
+      orders: An array (or a scalar) of orders (alphas).
+      rdp: A list (or a scalar) of RDP guarantees.
+      delta: The target delta.
+
+  Returns:
+      Pair of epsilon and optimal order alpha.
+
+  Raises:
+      ValueError
+          If the lengths of ``orders`` and ``rdp`` are not equal.
+  """
+  orders_vec = np.atleast_1d(orders)
+  rdp_vec = np.atleast_1d(rdp)
+
+  if len(orders_vec) != len(rdp_vec):
+    raise ValueError(
+      f"Input lists must have the same length.\n"
+      f"\torders_vec = {orders_vec}\n"
+      f"\trdp_vec = {rdp_vec}\n"
+    )
+
+  eps = rdp_vec - math.log(delta) / (orders_vec - 1)
+
+  # special case when there is no privacy
+  if np.isnan(eps).all():
+    return np.inf, np.nan
+
+  idx_opt = np.nanargmin(eps)  # Ignore NaNs
+  return eps[idx_opt], orders_vec[idx_opt]

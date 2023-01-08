@@ -22,6 +22,145 @@ def compute_rdp(q, noise_multiplier, steps, orders):
 
   return rdp * steps     #这里直接乘以总的迭代次数即可
 
+#整型
+def _compute_log_a_for_int_alpha(q, sigma, alpha):
+    assert isinstance(alpha, int)
+    rdp = -np.inf
+
+    for i in range(alpha + 1):
+        log_b = (
+                math.log(special.binom(alpha, i))
+                + i * math.log(q)
+                + (alpha - i) * math.log(1 - q)
+                + (i * i - i) / (2 * (sigma ** 2))
+        )
+
+        # rdp=math.exp(log_b)+math.exp(rdp)           # 当加到后面，math.exp计算的数字以小数表示，超过110000位数。超出了Double的范围，会导致溢出。所以我们用下面的方法
+
+        # 这边其实和上面我注释的等价，这里做了一些数值超出范围的处理
+        a, b = min(rdp, log_b), max(rdp, log_b)
+        if a == -np.inf:  # adding 0
+            rdp = b
+        else:
+            rdp = math.log(math.exp(
+                a - b) + 1) + b  # Use exp(a) + exp(b) = (exp(a - b) + 1) * exp(b),这里为什么不直接exp(a) + exp(b) ，可能是容易超出数值？
+
+    rdp = float(rdp) / (alpha - 1)
+    return rdp
+
+
+def _log_add(logx: float, logy: float) -> float:
+    r"""Adds two numbers in the log space.
+
+    Args:
+        logx: First term in log space.
+        logy: Second term in log space.
+
+    Returns:
+        Sum of numbers in log space.
+    """
+    a, b = min(logx, logy), max(logx, logy)
+    if a == -np.inf:  # adding 0
+        return b
+    # Use exp(a) + exp(b) = (exp(a - b) + 1) * exp(b)
+    return math.log1p(math.exp(a - b)) + b  # log1p(x) = log(x + 1)
+
+
+def _log_sub(logx: float, logy: float) -> float:
+    r"""Subtracts two numbers in the log space.
+
+    Args:
+        logx: First term in log space. Expected to be greater than the second term.
+        logy: First term in log space. Expected to be less than the first term.
+
+    Returns:
+        Difference of numbers in log space.
+
+    Raises:
+        ValueError
+            If the result is negative.
+    """
+    if logx < logy:
+        raise ValueError("The result of subtraction must be non-negative.")
+    if logy == -np.inf:  # subtracting 0
+        return logx
+    if logx == logy:
+        return -np.inf  # 0 is represented as -np.inf in the log space.
+
+    try:
+        # Use exp(x) - exp(y) = (exp(x - y) - 1) * exp(y).
+        return math.log(math.expm1(logx - logy)) + logy  # expm1(x) = exp(x) - 1
+    except OverflowError:
+        return logx
+
+def _log_erfc(x: float) -> float:
+    r"""Computes :math:`log(erfc(x))` with high accuracy for large ``x``.
+
+    Helper function used in computation of :math:`log(A_\alpha)`
+    for a fractional alpha.
+
+    Args:
+        x: The input to the function
+
+    Returns:
+        :math:`log(erfc(x))`
+    """
+    return math.log(2) + special.log_ndtr(-x * 2 ** 0.5)
+
+def _compute_log_a_for_frac_alpha(q: float, sigma: float, alpha: float) -> float:
+    r"""Computes :math:`log(A_\alpha)` for fractional ``alpha``.
+
+    Notes:
+        Note that
+        :math:`A_\alpha` is real valued function of ``alpha`` and ``q``,
+        and that 0 < ``q`` < 1.
+
+        Refer to Section 3.3 of https://arxiv.org/pdf/1908.10530.pdf for details.
+
+    Args:
+        q: Sampling rate of SGM.
+        sigma: The standard deviation of the additive Gaussian noise.
+        alpha: The order at which RDP is computed.
+
+    Returns:
+        :math:`log(A_\alpha)` as defined in Section 3.3 of
+        https://arxiv.org/pdf/1908.10530.pdf.
+    """
+    # The two parts of A_alpha, integrals over (-inf,z0] and [z0, +inf), are
+    # initialized to 0 in the log space:
+    log_a0, log_a1 = -np.inf, -np.inf
+    i = 0
+
+    z0 = sigma ** 2 * math.log(1 / q - 1) + 0.5
+
+    while True:  # do ... until loop
+        coef = special.binom(alpha, i)
+        log_coef = math.log(abs(coef))
+        j = alpha - i
+
+        log_t0 = log_coef + i * math.log(q) + j * math.log(1 - q)
+        log_t1 = log_coef + j * math.log(q) + i * math.log(1 - q)
+
+        log_e0 = math.log(0.5) + _log_erfc((i - z0) / (math.sqrt(2) * sigma))
+        log_e1 = math.log(0.5) + _log_erfc((z0 - j) / (math.sqrt(2) * sigma))
+
+        log_s0 = log_t0 + (i * i - i) / (2 * (sigma ** 2)) + log_e0
+        log_s1 = log_t1 + (j * j - j) / (2 * (sigma ** 2)) + log_e1
+
+        if coef > 0:
+            log_a0 = _log_add(log_a0, log_s0)
+            log_a1 = _log_add(log_a1, log_s1)
+        else:
+            log_a0 = _log_sub(log_a0, log_s0)
+            log_a1 = _log_sub(log_a1, log_s1)
+
+        i += 1
+        if max(log_s0, log_s1) < -30:
+            break
+
+    return _log_add(log_a0, log_a1) / (alpha - 1)
+
+
 # 这里计算RDP，是没有敏感度这个参数的，本质上是有敏感度参数，分子和分母会恰好把敏感度消掉，也就是这里的参数sigma是不包括敏感度的
 # 具体可以看这个的讨论：https://discuss.pytorch.org/t/how-to-adjusting-the-noise-increase-parameter-for-each-round/143548/17
 def _compute_rdp(q, sigma, alpha):
@@ -41,40 +180,21 @@ def _compute_rdp(q, sigma, alpha):
     if q == 0:
         return 0
 
+    # no privacy
+    if sigma == 0:
+        return np.inf
+
     #q=1时相当于没有抽样，这里大家会质疑为什么没有处以（alpha-1）,其实该系数已经被消掉了(see proposition 7 of https://arxiv.org/pdf/1702.07476.pdf 1)
     if q == 1.:  # 相当于没有抽样
         return alpha  / (2 * sigma ** 2)  # 没有抽样下参照RDP两个高斯的瑞丽分布，应该是 alpha*s  / (2 * sigma**2),这边为什么少了一个敏感度S，是默认函数敏感度为1吗，答案是敏感度和抵消了，这边的sigma里面没有敏感度的
 
-    # 这个判断几乎也用不到
-    # 对于标量输入，如果输入为正无穷大或负无穷大，则结果为值为True 的新布尔值。否则，值为False。
     if np.isinf(alpha):
-        return np.inf  # np.inf 表示+∞，是没有确切的数值的,类型为浮点型
+        return np.inf
 
-    """Compute log(A_alpha) for integer alpha. 0 < q < 1."""
-    # Initialize with 0 in the log space. 下面我们默认alpha都是Int类型进行计算，不做alpha为float的情况
-    assert isinstance(alpha, int)
-    rdp = -np.inf
-
-    for i in range(alpha + 1):
-        log_b = (
-                math.log(special.binom(alpha, i))
-                + i * math.log(q)
-                + (alpha - i) * math.log(1 - q)
-                + ( i * i - i) / (2 * (sigma ** 2))
-        )
-
-        # rdp=math.exp(log_b)+math.exp(rdp)           # 当加到后面，math.exp计算的数字以小数表示，超过110000位数。超出了Double的范围，会导致溢出。所以我们用下面的方法
-
-        # 这边其实和上面我注释的等价，这里做了一些数值超出范围的处理
-        a, b = min(rdp, log_b), max(rdp, log_b)
-        if a == -np.inf:  # adding 0
-            rdp = b
-        else:
-            rdp = math.log(math.exp(
-                a - b) + 1) + b  # Use exp(a) + exp(b) = (exp(a - b) + 1) * exp(b),这里为什么不直接exp(a) + exp(b) ，可能是容易超出数值？
-
-    rdp = float(rdp) / (alpha - 1)
-    return rdp
+    if float(alpha).is_integer(): #整型
+        return _compute_log_a_for_int_alpha(q, sigma, int(alpha))
+    else:  #浮点型
+        return _compute_log_a_for_frac_alpha(q, sigma, alpha)
 
 #[renyi differential privacy,2017,Proposition 5] 随机扰动没有抽样的
 #这里的入参就算扰动概率，和一组alpha，steps默认为1
@@ -97,7 +217,11 @@ def _compute_rdp_randomized_response(p,alpha):
     rdp=float(math.log(item1+item2))/ (alpha-1)
     return rdp
 
-if __name__=="__main__":
+
+if __name__ == '__main__':
+    ORDERS = [1 + x / 10.0 for x in range(1, 100)] + list(range(12, 64))
+
     orders = (list(range(2, 64)) + [128, 256, 512])  # 默认的lamda
-    rdp = compute_rdp(1024 / 50000, 1.54, 2000, orders)
-    print(rdp)
+    rdp = compute_rdp(2048 / 60000,2.15, 29, ORDERS)
+    print("rdp:",rdp)
+    print("ORDERS:",ORDERS)
