@@ -13,20 +13,21 @@ from privacy_analysis.RDP.compute_rdp import compute_rdp
 from privacy_analysis.RDP.rdp_convert_dp import compute_eps
 from train_and_validation.train import train
 from train_and_validation.train_with_dp import  train_dynamic_add_noise
-from train_and_validation.train_with_opacus import train_with_opacus
+from train_and_validation.train_with_opacus import train_with_opacus, train_privacy_opacus2
 from train_and_validation.validation import validation
 from openpyxl import Workbook
 import time
-
 from opacus import PrivacyEngine
-from opacus.utils import module_modification
-from opacus.dp_model_inspector import DPModelInspector
+
+
+
 
 #opacus<=0.13.0
-def centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma):
+def centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant):
 
     #如果用Resent模型需要加以下，将模型转换为opacus支持的
-    #可以运行，打印看下前后网络的差别
+    from opacus.utils import module_modification
+    from opacus.dp_model_inspector import DPModelInspector
     model = module_modification.convert_batchnorm_modules(model)
     # inspector = DPModelInspector()
     # print(f"Is the model valid? {inspector.validate(model)}")
@@ -61,7 +62,8 @@ def centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_si
         sample_rate=batch_size / len(train_data),
         alphas=ORDERS,
         noise_multiplier=sigma,
-        max_grad_norm=max_norm
+        max_grad_norm=max_norm,
+        accountant=privacy_accoutant
     )
     privacy_engine.attach(optimizer)
 
@@ -71,25 +73,26 @@ def centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_si
         central_test_loss, central_test_accuracy = validation(model, test_dl)
 
 
-        # 这里要每次根据simga累加它的RDP，循环结束再转为eps，每个epoch的迭代次数为privacy_engine.steps
-        rdp_every_epoch=compute_rdp(batch_size/len(train_data), sigma, privacy_engine.steps, ORDERS)
-        rdp=rdp+rdp_every_epoch
-        epsilon, best_alpha = compute_eps(ORDERS, rdp, delta)
-        epsilon_list.append(epsilon)
+        #按照一个batch进行，opacus<=0.13.0的没有prv
+        epsilon = privacy_engine.accountant.get_epsilon(delta=delta)
+
 
         result_loss_list.append(central_test_loss)
         result_acc_list.append(central_test_accuracy)
 
         print("epoch: {:3.0f}".format(epoch + 1) + " | epsilon: {:7.4f}".format(
-        epsilon) + " | best_alpha: {:7.4f}".format(best_alpha)  )
+        epsilon))
 
 
     print("------ Training finished ------")
 
 
 #opacus>=1.0.1
-def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma):
+def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant):
 
+    from opacus.validators import ModuleValidator
+    if not ModuleValidator.is_valid(model):
+        model = ModuleValidator.fix(model)
 
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
@@ -111,16 +114,10 @@ def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_s
         test_data, batch_size=batch_size, shuffle=False)
 
     print("------ Centralized Model ------")
-    rdp=0
-    orders = (list(range(2, 64)) + [128, 256, 512])  # 默认的lamda
     epsilon_list=[]
     result_loss_list=[]
     result_acc_list=[]
-
-
-
-    privacy_engine = PrivacyEngine()
-    #privacy_engine = PrivacyEngine(secure_mode ="False")
+    privacy_engine = PrivacyEngine(accountant=privacy_accoutant) #opacus>=1.3 提供rdp,gdp和prv三种隐私计算方式
     model_opacus, optimizer_opacus, train_dl_opacus = privacy_engine.make_private(
         module=model,
         optimizer=optimizer,
@@ -129,36 +126,32 @@ def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_s
         max_grad_norm=max_norm,
     )
 
-
     for epoch in range(numEpoch):
 
-       # print("model:",model.state_dict())
-       # train_dl = minibatch_loader(train_data)     #抽样
-       #这里要动态加噪，每次传入的sigma可能会改变
-        central_train_loss, central_train_accuracy = train(model_opacus, train_dl_opacus, optimizer_opacus)
+
+        central_train_loss, central_train_accuracy = train_privacy_opacus2(model_opacus, train_dl_opacus, optimizer_opacus)
         central_test_loss, central_test_accuracy = validation(model_opacus, test_dl)
 
-        # 这里要每次根据simga累加它的RDP，循环结束再转为eps，这里的epoch系数直接设为iterations(epoch里的迭代次数)，每次算一轮累和
-        rdp_every_epoch=compute_rdp(batch_size/len(train_data), sigma, 1*iterations, orders)
-        rdp=rdp+rdp_every_epoch
-        epsilon, best_alpha = compute_eps(orders, rdp, delta)
-        epsilon_list.append(epsilon)
+        #下面的计算都是需要一个完整的epoch
+        epsilon = privacy_engine.accountant.get_epsilon(delta=delta)
+
 
         result_loss_list.append(central_test_loss)
         result_acc_list.append(central_test_accuracy)
 
-        print("epoch: {:3.0f}".format(epoch + 1) + " | epsilon: {:7.4f}".format(
-        epsilon) + " | best_alpha: {:7.4f}".format(best_alpha)  )
+        print("privacy_accoutant:",privacy_accoutant+"| epoch: {:3.0f}".format(epoch + 1) + " | epsilon: {:7.4f}".format(
+        epsilon)   )
 
 
     print("------ Training finished ------")
 
 if __name__=="__main__":
 
-    train_data, test_data = get_data('cifar10', augment=False)
+    #train_data, test_data = get_data('cifar10', augment=False)
+    train_data, test_data = get_data('mnist', augment=False)
    #  print(train_data.__dict__)
-    #model = Cifar10CNN()
-    model= resnet20(10, False)  #这个跑不起来
+    model = CNN_tanh()
+    #model= resnet20(10, False)  #含有batchNorm层的需要进行模型转换
     batch_size =512
     learning_rate = 1.0
     numEpoch = 1500
@@ -166,4 +159,5 @@ if __name__=="__main__":
     momentum = 0.9
     delta = 10 ** (-5)
     max_norm =0.1
-    centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma)
+    privacy_accoutant='rdp' #rdp,gdp,prv(opacus>=1.3.0)
+    centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant)

@@ -10,8 +10,8 @@ def compute_zcdp_random_reshuffling(epoch,sigma):
     zcdp=1/(2*sigma**2)
     return epoch*zcdp
 
-#《Differentially Private Model Publishing for Deep Learning》说到对于随机采样放回，没有隐私放大的效果，所有多少的采样率都一样
-#这里的Iters，我们认为是所有batch的训练次数，和epoch不一样
+#《Differentially Private Model Publishing for Deep Learning》说到对于随机采样放回，没有隐私放大的效果，所以多少的采样率都一样
+#这里的Iters是一个batch的训练，所以这个batch取多大都可以。
 def compute_zcdp_sampling_with_replacement(iters,sigma):
     if sigma<=0:
         return 0
@@ -22,12 +22,14 @@ def zcdp_convert_dp(zcdp,delta):
     eps=zcdp + 2*np.sqrt(zcdp * np.log(1/delta))
     return eps
 
+#zcdp随机排列的直接调用这个，这个会调上面两个
 def compute_dp_through_zcdp_random_reshuffling(k,sigma,delta):
     zcdp=compute_zcdp_random_reshuffling(k,sigma)
     eps=zcdp_convert_dp(zcdp,delta)
     return eps
 
+#zcdp有放回采样直接调用这个，这个会调上面两个
 def compute_dp_through_zcdp_sampling_with_replacement(k,sigma,delta):
-    zcdp=compute_zcdp_random_reshuffling(k,sigma)
+    zcdp=compute_zcdp_sampling_with_replacement(k,sigma)
     eps=zcdp_convert_dp(zcdp,delta)
     return eps

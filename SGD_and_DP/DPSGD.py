@@ -1,7 +1,9 @@
 from data.fed_data_distribution.pathological_nonIID_data import pathological_split_noniid
 from data.get_data import get_data
+from data.util.compute_model_l2_norm import compute_model_l2norm
 from data.util.sampling import get_data_loaders_uniform_without_replace
-from model.CNN import CNN_tanh, CNN
+from data.util.weight_initialization import init_weights
+from model.CNN import CNN_tanh, CNN, CIFAR10_CNN
 from model.ResNet import resnet20
 from optimizer.dp_optimizer import DPSGD, DPAdam
 import torch
@@ -19,16 +21,15 @@ import time
 def centralization_train_with_dp(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma):
 
 
-    optimizer = DPAdam(
+    optimizer = DPSGD(
         l2_norm_clip=max_norm,      #裁剪范数
         noise_multiplier=sigma,
         minibatch_size=batch_size,        #几个样本梯度进行一次梯度下降
         microbatch_size=1,                #几个样本梯度进行一次裁剪，这里选择逐样本裁剪
         params=model.parameters(),
         lr=learning_rate,
-        # momentum=momentum
+        momentum=momentum
     )
-    centralized_criterion = nn.CrossEntropyLoss()
 
     # 包装抽样函数
     minibatch_size = batch_size  # 这里比较好的取值是根号n，n为每个客户端的样本数
@@ -36,9 +37,6 @@ def centralization_train_with_dp(train_data, test_data, model,batch_size, numEpo
     iterations = 1  # n个batch，这边就定一个，每次训练采样一个Lot
     minibatch_loader, microbatch_loader = get_data_loaders_uniform_without_replace(minibatch_size, microbatch_size, iterations)     #无放回均匀采样
 
-    # Dataset是一个包装类，用来将数据包装为Dataset类，然后传入DataLoader中，我们再使用DataLoader这个类来更加快捷的对数据进行操作。
-    # DataLoader是一个比较重要的类，它为我们提供的常用操作有：batch_size(每个batch的大小), shuffle(是否进行shuffle操作)
-    # DataLoader里的数据要通过for i ,data in enumerate(DataLoader)才能打印出来
 
     #train数据在下面进行采样，这边不做dataloader
     test_dl = torch.utils.data.DataLoader(
@@ -52,25 +50,29 @@ def centralization_train_with_dp(train_data, test_data, model,batch_size, numEpo
     result_acc_list=[]
     for epoch in range(numEpoch):
 
-       # print("model:",model.state_dict())
         train_dl = minibatch_loader(train_data)     #抽样
-       #这里要动态加噪，每次传入的sigma可能会改变
-        central_train_loss, central_train_accuracy = train_dynamic_add_noise(model, train_dl, centralized_criterion, optimizer)
+
+    #这里要动态加噪，每次传入的sigma可能会改变
+        central_train_loss, central_train_accuracy = train_dynamic_add_noise(model, train_dl, optimizer)
         central_test_loss, central_test_accuracy = validation(model, test_dl)
 
         # 这里要每次根据simga累加它的RDP，循环结束再转为eps，这里的epoch系数直接设为iterations(epoch里的迭代次数)，每次算一轮累和
-        rdp_every_epoch=compute_rdp(batch_size/len(train_data), sigma, 1*iterations, orders)
-        rdp=rdp+rdp_every_epoch
-        epsilon, best_alpha = compute_eps(orders, rdp, delta)
-        epsilon_list.append(epsilon)
-
-        result_loss_list.append(central_test_loss)
-        result_acc_list.append(central_test_accuracy)
-
-        print("epoch: {:3.0f}".format(epoch + 1) + " | epsilon: {:7.4f}".format(
-        epsilon) + " | best_alpha: {:7.4f}".format(best_alpha)  )
-
+        # rdp_every_epoch=compute_rdp(batch_size/len(train_data), sigma, 1*iterations, orders)
+        # rdp=rdp+rdp_every_epoch
+        # epsilon, best_alpha = compute_eps(orders, rdp, delta)
+        # epsilon_list.append(epsilon)
+        #
+        # result_loss_list.append(central_test_loss)
+        # result_acc_list.append(central_test_accuracy)
+        #
+        # print("epoch: {:3.0f}".format(epoch + 1) + " | epsilon: {:7.4f}".format(
+        # epsilon) + " | best_alpha: {:7.4f}".format(best_alpha)  )
+        #
+        # print(compute_model_l2norm(model))
         # if (epsilon > 3):
+        #     break
+        if (epoch > 6200):
+            break
         #     wb = Workbook()
         #     sheet = wb.active
         #     sheet.title = "result"
@@ -93,15 +95,18 @@ def centralization_train_with_dp(train_data, test_data, model,batch_size, numEpo
 
 if __name__=="__main__":
 
-    train_data, test_data = get_data('cifar10', augment=False)
+    train_data, test_data = get_data('mnist', augment=False)
    #  print(train_data.__dict__)
-   #  model = CNN()
-    model= resnet20(10, False)
-    batch_size = 256
-    learning_rate = 0.002
-    numEpoch = 1500
-    sigma = 0.0000001
+    model = CNN_tanh()
+    #init_weights(model, init_type='xavier', init_gain=0.5)
+
+    #model= resnet20(10, False)
+    #model= CIFAR10_CNN(3, input_norm=None, num_groups=None, size=None)
+    batch_size = 512
+    learning_rate =0.5
+    numEpoch = 15000
+    sigma = 1.23
     momentum = 0.9
     delta = 10 ** (-5)
-    max_norm =1000
+    max_norm =0.1
     centralization_train_with_dp(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma)

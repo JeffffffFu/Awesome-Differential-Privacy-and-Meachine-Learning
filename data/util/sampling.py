@@ -143,20 +143,20 @@ def get_data_loaders_possion(minibatch_size, microbatch_size, iterations, drop_l
     return minibatch_loader, microbatch_loader   #返回的是函数，不是数据，这里要注意了
 
 '''
-#test,第一种无法进行隐私预算分析，后面三个都有对应的隐私分析
+#test,第一种和第二种其实一样，后面三个都有对应的隐私分析。默认现在的操作都是用第一种操作，然后给到第三种的隐私预算。
 b=torch.tensor([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])
 print("data数据,数据总量20：",b)
 dataset=TensorDataset(b)
-print("1、基于传统DataLoader（当前SGD用的数据处理方法）,batchsize=5-----------")
+print("1、基于传统DataLoader（当前SGD用的数据处理方法）,batchsize=5-----------") #也叫随机重组 在《Differentially Private Model Publishing for Deep Learning》
 train_dl = DataLoader(dataset, batch_size=5, shuffle=True)
 for data in train_dl:
     print(data)
-print("2、基于uniform sampling(without replace),batchsize=5-----------")
+print("2、基于uniform sampling(without replacement),batchsize=5-----------")
 minibatch_loader, microbatch_loader = get_data_loaders_uniform_without_replace(5, 1, 4)
 a=minibatch_loader(dataset)
 for data in a:
     print(data)
-print("3、基于uniform sampling(with replace),batchsize=5-----------")
+print("3、基于uniform sampling(with replacement),batchsize=5-----------")
 minibatch_loader, microbatch_loader = get_data_loaders_uniform_with_replace(5, 1, 4)
 a=minibatch_loader(dataset)
 for data in a:

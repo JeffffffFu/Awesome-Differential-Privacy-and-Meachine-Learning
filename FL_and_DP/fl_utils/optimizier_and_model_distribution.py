@@ -5,14 +5,14 @@ from model.CNN import CNN
 from optimizer.dp_optimizer import DPAdam
 
 
-def create_model_optimizer_criterion_dict(number_of_clients, learning_rate, momentum):
+def create_model_optimizer_criterion_dict(number_of_clients, learning_rate, model):
     clients_model_list = []
     clients_optimizer_list = []
     clients_criterion_list = []
 
     #为各个客户端分配model,optimizer等
     for i in range(number_of_clients):
-        model_info = CNN()
+        model_info = model
         # model_info = Net2nn()
         clients_model_list.append(model_info)
 

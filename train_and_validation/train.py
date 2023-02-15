@@ -16,8 +16,9 @@ def train(model, train_loader, optimizer):
     train_acc= 0.0
     i=0
 
-    for data, target in train_loader:  # batch之前组装到data数据集里的,pytorch的MBDG统一用这种方式进行,会按序列一个个btach训练
-
+    for id, (data, target) in enumerate(train_loader):
+        # if id==0:
+        #     print("测试集：",data[0]) #这边同样DPSGD的验证集也是浮点型的
         output = model(data.to(torch.float32))  # 计算输出
         loss = F.cross_entropy(output, target.to(torch.long))  # 损失函数
         optimizer.zero_grad()  # 梯度清空

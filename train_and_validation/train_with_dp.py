@@ -11,13 +11,13 @@ def train_dynamic_add_noise(model, train_loader, optimizer):
     aa=0
     train_acc=0.
     i=0
-    for id,(data, target) in enumerate(train_loader):  # batch之前组装到data数据集里的,pytorch的MBDG统一用这种方式进行,会按序列一个个batch训练
+    for id,(data, target) in enumerate(train_loader):
         optimizer.zero_accum_grad()  # 梯度清空
         for iid,(X_microbatch, y_microbatch) in enumerate(TensorDataset(data, target)):  #这里相当于逐样本
-
             optimizer.zero_microbatch_grad()
             output = model(torch.unsqueeze(X_microbatch.to(torch.float32), 0))    #这要是这里要做升维
-            loss = F.cross_entropy(output, torch.unsqueeze(y_microbatch, 0))
+
+            loss = F.cross_entropy(output, torch.unsqueeze(y_microbatch.to(torch.long), 0))
 
             loss.backward()         #梯度求导，这边求出梯度
             optimizer.microbatch_step()  # 这个step做的是每个样本的梯度裁剪和梯度累加的操作

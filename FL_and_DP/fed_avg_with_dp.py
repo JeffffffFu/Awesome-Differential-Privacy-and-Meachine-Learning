@@ -77,7 +77,6 @@ def fed_avg_with_dp_sample_level_many_batch(train_data,test_data,number_of_clien
     clients_model_list, clients_optimizer_list, clients_criterion_list = create_model_optimizer_criterion_dict_with_dp_optimizer(number_of_clients, learning_rate,
                                                                                        momentum,max_norm,sigma,batch_size_of_each_clients)
 
-
     # 初始化中心模型,本质上是用来接收客户端的模型并加权平均进行更新的一个变量
     center_model = CNN()
 

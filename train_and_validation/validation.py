@@ -13,10 +13,12 @@ def validation(model, test_loader):
     device='cpu'
 
     with torch.no_grad():
-        for data, target in test_loader:
+        for id,(data, target) in enumerate(test_loader):
+            # if id==0:
+            #     print("测试集：",data[0]) #这边同样DPSGD的验证集也是浮点型的
             data, target = data.to(device), target.to(device)
             output = model(data.to(torch.float32))
-            test_loss += F.cross_entropy(output, target, reduction='sum').item()
+            test_loss += F.cross_entropy(output, target.to(torch.long), reduction='sum').item()
             pred = output.max(1, keepdim=True)[1]
             correct += pred.eq(target.view_as(pred)).sum().item()
             num_examples += len(data)

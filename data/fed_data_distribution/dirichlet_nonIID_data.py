@@ -2,17 +2,22 @@ import math
 
 import numpy as np
 import torch
+import torchvision
 from torch.utils.data import DataLoader, TensorDataset
 
 
 #《Federated Learning on Non-IID Data Silos: An Experimental Study》
 #按Dirichlet分布划分Non-IID数据集：https://zhuanlan.zhihu.com/p/468992765
+from data.util.custom_tensor_dataset import CustomTensorDataset
+
+
 def dirichlet_split_noniid(train_labels, alpha, n_clients, seed):
     '''
     参数为alpha的Dirichlet分布将数据索引划分为n_clients个子集
     狄利克雷分布相关函数
     '''
     np.random.seed(seed)
+    train_labels=torch.tensor(train_labels)
     n_classes = train_labels.max() + 1
     label_distribution = np.random.dirichlet([alpha] * n_clients, n_classes)  # 第一个参数是list，是n_clients个alpha
     # (K, N)的类别标签分布矩阵X，记录每个client占有每个类别的多少
@@ -41,9 +46,20 @@ def create_Non_iid_subsamples_dirichlet(n_clients, alpha, seed, train_data):
     x是数据，y是标签
     @Author:LingXinPeng
     """
+    if train_data.data.ndim==4:  #默认这个是cifar10,下面的transforms参数来源于getdata时候的参数
+        transform = torchvision.transforms.Compose(
+            [
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+            ]
+        )
+
+    else:  #这个是mnist和fmnist数据
+        train_data.data = torch.unsqueeze(train_data.data, 3)  #升维为NHWC，默认1通道。这边注意我们不需要转换维度，CustomTensorDataset包装后，后面会自动转换维度
+        transform = torchvision.transforms.ToTensor()
 
     # 这里返回的是一个二维list，每个二级list装了对应下标的client分配到的数据的索引
-    train_labels=train_data.targets    #得到全部样本的标签
+    train_labels=torch.tensor(train_data.targets)    #得到全部样本的标签
 
     client_idcs = dirichlet_split_noniid(train_labels, alpha, n_clients, seed)
 
@@ -55,15 +71,12 @@ def create_Non_iid_subsamples_dirichlet(n_clients, alpha, seed, train_data):
         indices = np.sort(client_idcs[i])
         indices=torch.tensor(indices)
 
-        data=train_data.data / 255.0
-        imgae=torch.index_select(data,0,indices)
-        imgae=torch.unsqueeze(imgae,1)       #在1的位置增加一维
-
+        imgae=torch.index_select(torch.tensor(train_data.data),0,indices)
         targets=torch.index_select(train_labels,0,indices)
-        data_info=TensorDataset(imgae,targets)
+
+        data_info=CustomTensorDataset((imgae,targets), transform)
         clients_data_list.append(data_info)
 
-    print("注意查看训练集的data的数据类型是不是0-255的无符号整型")
     #print("clients_data_list:",clients_data_list[1][1])
     return clients_data_list
 

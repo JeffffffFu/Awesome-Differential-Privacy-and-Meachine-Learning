@@ -58,6 +58,26 @@ def apply_dp_sgd_analysis(q, sigma, steps, orders, delta):
 
   return eps, opt_order
 
+
+#这个函数会调用计算RDP，和RDP转DP两个函数,如果只想传参steps，可以直接用这个函数而不用上面那个
+def apply_dp_sgd_analysis_old(q, sigma, steps, orders, delta):
+  """Compute and print results of DP-SGD analysis."""
+
+  # compute_rdp requires that sigma be the ratio of the standard deviation of
+  # the Gaussian noise to the l2-sensitivity of the function to which it is
+  # added. Hence, sigma here corresponds to the `noise_multiplier` parameter   sigma=noise_multilpier
+  # in the DP-SGD implementation found in privacy.optimizers.dp_optimizer
+  rdp = compute_rdp(q, sigma, steps, orders)      #先算RDP、也就是RDP定义下总的隐私损失alpha，如果根据RDP算的话，可能会依据RDP的文章
+
+  eps, opt_order = compute_eps(orders, rdp, delta)    #再根据RDP转换为对应的最佳eps和lamda
+
+
+  if opt_order == max(orders) or opt_order == min(orders):            #这个是一个提示可以忽略，主要告诉我们可以扩展我们的orders的范围
+    print('The privacy estimate is likely to be improved by expanding '
+          'the set of orders.')
+
+  return eps, opt_order
+
 '''
 orders = (list(range(2, 64)) + [128, 256, 512])  # 默认的lamda
 eps, opt_order=apply_dp_sgd_analysis(256/60000, 1.1, 17470, orders, 10**(-5))
