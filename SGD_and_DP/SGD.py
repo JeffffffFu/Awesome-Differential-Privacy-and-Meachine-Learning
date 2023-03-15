@@ -1,6 +1,6 @@
 
 import torch
-from torch import nn
+from torch import nn, optim
 from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 
@@ -12,12 +12,17 @@ from data.get_data import get_data
 from data.util.weight_initialization import init_weights
 from model.CNN import CNN, Cifar10CNN, CIFAR10_CNN, CNN_tanh
 from data.util.sampling import get_data_loaders_uniform_without_replace
+from model.DNN import DNN
 from model.ResNet import resnet20
+from model.vgg_bn import vgg19_bn
 from train_and_validation.train import train
 from train_and_validation.validation import validation
 
 def centralization_train(train_data, test_data, batch_size, model, numEpoch, learning_rate):
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=0.5)
+    # scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, verbose=True,
+    #                                                  threshold=0.00005, threshold_mode='rel', cooldown=0, min_lr=0,
+    #                                                  eps=1e-08)
 
     minibatch_size = batch_size  # 这里比较好的取值是根号n，n为每个客户端的样本数
     microbatch_size = 1  #这里默认1就好
@@ -35,7 +40,7 @@ def centralization_train(train_data, test_data, batch_size, model, numEpoch, lea
 
     print("------ Centralized Model ------")
     for epoch in range(numEpoch):
-        train_dl = minibatch_loader(train_data)
+        #train_dl = minibatch_loader(train_data)
 
         central_train_loss, central_train_accuracy = train(model, train_dl,optimizer)
         central_test_loss, central_test_accuracy = validation(model, test_dl)
@@ -48,9 +53,12 @@ def centralization_train(train_data, test_data, batch_size, model, numEpoch, lea
 if __name__=="__main__":
     train_data, test_data = get_data('mnist', augment=False)
     model = CNN_tanh()
-    init_weights(model, init_type='xavier', init_gain=0.1)
+    #model = vgg19_bn(input_channel=1, num_classes=10)
+    model=DNN()
+
+    #init_weights(model, init_type='xavier', init_gain=0.1)
     #model= resnet20(10, False)
     batch_size=256
-    learning_rate = 0.002
-    numEpoch = 200
+    learning_rate = 0.06
+    numEpoch = 10
     centralization_train(train_data, test_data, batch_size, model, numEpoch, learning_rate)

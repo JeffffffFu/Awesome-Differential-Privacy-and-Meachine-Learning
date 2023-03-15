@@ -43,21 +43,32 @@ def get_data(name, augment=False, **kwargs):
                                     ))
 
     elif name == "fmnist":
+        transform = transforms.Compose([
+            transforms.Resize((64, 64)),
+            transforms.ToTensor(),
+            # transforms.Normalize((0.1307,), (0.3081,))
+        ])
         train_set = datasets.FashionMNIST(root='../data', train=True,
-                                          transform=transforms.ToTensor(),
+                                          transform=transform,
                                           download=True)
 
         test_set = datasets.FashionMNIST(root='../data', train=False,
-                                         transform=transforms.ToTensor(),
+                                         transform=transform,
                                          download=True)
 
     elif name == "mnist":
+        transform = transforms.Compose([
+            transforms.Resize((64, 64)),
+            transforms.ToTensor(),
+            # transforms.Normalize((0.1307,), (0.3081,))
+        ])  #VGG模型需要用到这个Resize
+        transform=transforms.ToTensor()
         train_set = datasets.MNIST(root='../data', train=True,
-                                   transform=transforms.ToTensor(),
+                                   transform=transform,
                                    download=True)
 
         test_set = datasets.MNIST(root='../data', train=False,
-                                  transform=transforms.ToTensor(),
+                                  transform=transform,
                                   download=True)
 
     elif name == "cifar10_500K":

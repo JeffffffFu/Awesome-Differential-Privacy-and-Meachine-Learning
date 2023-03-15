@@ -45,7 +45,7 @@ def fed_avg_with_dp_sample_level(train_data,test_data,number_of_clients,learning
         print("现在进行和中心方的第{:3.0f}轮联邦训练".format(i+1))
 
         # 1 中心方广播参数给各个客户端
-        model_dict = send_main_model_to_clients(center_model, clients_model_list)
+        center_model_list = send_main_model_to_clients(center_model, clients_model_list)
 
         # 2本地梯度下降需要加噪
         local_clients_train_process_with_dp_one_epoch(number_of_clients,clients_data_list,clients_model_list,clients_criterion_list,clients_optimizer_list,numEpoch,q)
