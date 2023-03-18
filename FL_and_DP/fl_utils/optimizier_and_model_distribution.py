@@ -1,7 +1,9 @@
+import copy
+
 import torch
 from torch import nn
 
-from model.CNN import CNN
+from model.CNN import CNN, CNN_tanh
 from optimizer.dp_optimizer import DPAdam
 
 
@@ -12,8 +14,10 @@ def create_model_optimizer_criterion_dict(number_of_clients, learning_rate, mode
 
     #为各个客户端分配model,optimizer等
     for i in range(number_of_clients):
-        model_info = model
-        # model_info = Net2nn()
+
+        # model_info = CNN_tanh()
+        # model_info.load_state_dict(model.state_dict())
+        model_info=copy.deepcopy(model)
         clients_model_list.append(model_info)
 
         optimizer_info = torch.optim.SGD(model_info.parameters(), lr=learning_rate)

@@ -13,9 +13,10 @@ from torch.utils.data import TensorDataset, DataLoader
 #60000个样本十个客户端，一个客户端6000个样本,一个样本大概4个切片
 from data.util.custom_tensor_dataset import CustomTensorDataset
 
-#按标签排序，然后划分成40个切片，然后每个客户端随机分配几个切片。
+#按标签排序，然后划分成40个切片，然后每个客户端随机分配几个切片。适用于十个客户端的。
 def pathological_split_noniid(train_data, n_clients, alpha, seed,q):
 
+    num_shards=4*n_clients  #默认一个得到4个切片
     if train_data.data.ndim==4:  #默认这个是cifar10,下面的transforms参数来源于getdata时候的参数
         transform = torchvision.transforms.Compose(
             [
@@ -38,9 +39,9 @@ def pathological_split_noniid(train_data, n_clients, alpha, seed,q):
     y_data = y_data[ind]
 
 
-    shards = np.arange(40)  # 切片数40，10个客户端一个客户端4个切片，一个切片1500个样本，[0 1 2 .... 399] 从0到400的数组
-    shard_size = len(y_data) / 40  # 每个切片的大小
-    shard_per_client = int(40 / n_clients)  # 每个客户端应该得到的切片数
+    shards = np.arange(num_shards)  # 切片数40，10个客户端一个客户端4个切片，一个切片1500个样本，[0 1 2 .... 399] 从0到400的数组
+    shard_size = len(y_data) / num_shards  # 每个切片的大小
+    shard_per_client = int(num_shards / n_clients)  # 每个客户端应该得到的切片数
     np.random.seed(seed)
     np.random.shuffle(shards)  # 对切片进行随机扰动
 

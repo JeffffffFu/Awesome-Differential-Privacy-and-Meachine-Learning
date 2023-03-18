@@ -3,6 +3,10 @@
 import numpy as np
 import math
 from scipy import special
+
+from privacy_analysis.RDP.rdp_convert_dp import compute_eps
+
+
 def compute_rdp(q, noise_multiplier, steps, orders):
   """Computes RDP of the Sampled Gaussian Mechanism.
   Args:
@@ -219,9 +223,13 @@ def _compute_rdp_randomized_response(p,alpha):
 
 
 if __name__ == '__main__':
-    ORDERS = [1 + x / 10.0 for x in range(1, 100)] + list(range(12, 64))
+    ORDERS = [1 + x / 10.0 for x in range(1, 100)] + list(range(12, 128))
+    p=0.7
+    steps=100
+    q=3000/60000
+    delta=1e-5
+    rdp=compute_rdp_randomized_response(p, steps, ORDERS, q)
+    dp,ord=compute_eps(ORDERS, rdp, delta)
 
-    orders = (list(range(2, 64)) + [128, 256, 512])  # 默认的lamda
-    rdp = compute_rdp(2048 / 60000,2.15, 29, ORDERS)
-    print("rdp:",rdp)
-    print("ORDERS:",ORDERS)
+    print("rdp:",dp)
+    print("ORDERS:",ord)

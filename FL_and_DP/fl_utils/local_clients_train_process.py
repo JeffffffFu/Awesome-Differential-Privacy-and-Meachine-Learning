@@ -140,7 +140,7 @@ def local_clients_train_process_one_epoch_with_ldp_gaussian(number_of_clients,cl
     for i in range(number_of_clients):
 
         batch_size=math.floor(len(clients_data_list[i])*q)
-        batch_size=256
+        batch_size=64
         train_dl = torch.utils.data.DataLoader(
             clients_data_list[i], batch_size=batch_size, shuffle=False,drop_last=True)
         # 各客户端取到自己对应的模型,损失函数和优化器
