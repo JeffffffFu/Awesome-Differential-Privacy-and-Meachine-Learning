@@ -8,6 +8,11 @@ from torch.nn.utils.clip_grad import clip_grad_norm_
 from torch.distributions.normal import Normal
 from torch.optim import SGD, Adam, Adagrad, RMSprop
 
+from data.util.compute_coordinates import cartesian_to_polar, \
+    polar_to_cartesian, vector_to_matrix, cartesian_add_noise, devide_epslion
+from privacy_analysis.RDP.compute_dp_sgd import apply_dp_sgd_analysis
+
+
 #cls表示你用的是哪个梯度下降的原函数，只有下面四种选择。
 # *agrs,##kwargs为了解决不同梯度下降函数的参数问题，因为大家要的参数不同，统一用这两个进行入参填补，具体要传入的参数可以在创建这个DPOptimizer的时候输入
 #比如SGD就不需要动能参数。
@@ -79,6 +84,50 @@ def make_optimizer_class(cls):
 
                         # 对求和的梯度进行加噪。randn_like：返回与输入相同大小的张量，该张量由区间[0,1)上均匀分布的随机数填充。torch.randn_like可以理解为标准正态分布
                         param.grad.data.add_(self.l2_norm_clip * self.noise_multiplier * torch.randn_like(param.grad.data))
+
+                        # 再除以batch数平均化
+                        param.grad.data.mul_(self.microbatch_size / self.minibatch_size)
+
+            # 调用原函数的梯度下降,假设这个step只做梯度下降，包括学习率的那个梯度更新操作
+            super(DPOptimizerClass, self).step(*args, **kwargs)
+
+        def step_dp_split_vector(self, *args, **kwargs):
+            for group in self.param_groups:
+                # print("group: ",group)
+                for param, accum_grad in zip(group['params'],
+                                             group['accum_grads']):  # 整个group里面包含params和accum_grads两个模块 逐层操作
+                    # print("param: ",param)
+                    if param.requires_grad:
+                       # print("accum_grad.shape():",accum_grad.shape)
+                        # 将accum-grad求和后的梯度全部压缩成一维向量
+                        gradient = accum_grad.clone().view(-1)  # 将 x 压缩成一维向量
+                        n=len(gradient)
+                       # print("转之前的gradient:",gradient)
+
+                        # 转成极坐标的形式
+                        coordinates = cartesian_to_polar(gradient)  #会比原来多一个向量范数的元素。
+                       # print("coordinates:",coordinates)
+
+                        #进行budget划分
+                        sigma1,sigma2=devide_epslion(sigma=1.23, q=512/60000, n=n)
+
+                        #加噪
+                        coordinates_after_noise=cartesian_add_noise(coordinates,sigma1,0.1,sigma2)
+                      #  print("coordinates_after_noise:",coordinates_after_noise)
+
+                        #转回向量
+                        gradient=polar_to_cartesian(coordinates_after_noise)
+                     #   print("转回之后的gradient:",gradient)
+                       # param.grad.data = gradient
+
+
+                        #一维向量转换M*N*T
+                        gradient=vector_to_matrix(gradient,accum_grad.shape)
+                        param.grad.data=torch.from_numpy(gradient)
+                      #  print("转回M维后的gradient:",gradient)
+
+                        # 对求和的梯度进行加噪。randn_like：返回与输入相同大小的张量，该张量由区间[0,1)上均匀分布的随机数填充。torch.randn_like可以理解为标准正态分布
+                        #param.grad.data.add_(self.l2_norm_clip * self.noise_multiplier * torch.randn_like(param.grad.data))
 
                         # 再除以batch数平均化
                         param.grad.data.mul_(self.microbatch_size / self.minibatch_size)

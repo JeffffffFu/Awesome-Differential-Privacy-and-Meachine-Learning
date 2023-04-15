@@ -57,7 +57,7 @@ def compute_eps(orders, rdp, delta):
   return max(0, eps_vec[idx_opt]), orders_vec[idx_opt]
 
 
-# 下面这个是最初的RDP转DP的公式，20年之前很多文章，包括opacus的老版本应该用的是这个
+# 下面这个是最初的RDP转DP的公式，2020年之前很多文章，包括opacus的老版本应该用的是这个
 # Basic bound (see https://arxiv.org/abs/1702.07476 Proposition 3 in v3):
 # #[Mironov, 2017, Propisition 3]是RDP转DP原始的公式，可能不够紧凑
 #   eps = min( rdp_vec - math.log(delta) / (orders_vec - 1) )

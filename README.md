@@ -167,7 +167,7 @@ TO DO
 ### Horizontal-FL with DP
 
 #### client-Level
-保护的是客户端的参与信息,将客户端的模型看成一个数据
+保护的是客户端的参与信息,将客户端的模型看成一个数据,联邦中心方非敌手
 
 | Title | Team/Main Author | Venue and Year | Key Description 
 | :------------| :------ | :---------- | :----------------------- 
@@ -187,12 +187,13 @@ TO DO
 | Adap DP-FL: Differentially Private Federated Learning with Adaptive Noise  | Jie Fu | Trustcom/2022 | 主要是两个自适应点，一个是不同客户端不同轮的自适应裁剪范数，一个是不同轮的自适应噪声系数衰减。                                                                                                                                                                                                        | 
 | DPAUC: Differentially Private AUC Computation in Federated Learning  | Jiankai Sun | 2022 | 作者举了一个联邦下客户端模型根据本地测试集进行性能评测算出AUC给中心方的场景，该场景认为AUC（ROC curve）会泄露客户端本地测试集隐私信息，故在传给中心方相关FP和FN等数值上加拉普拉斯噪声进行隐私保护。                                                                                                                                            | 
 #### LDP-FL
-没有客户端中心方做小批量梯度下降，一般这种场景一个客户端只有一个样本数据，如果有多个样本数据会训练多个梯度上传给联邦中心方
+上面的会把模型看成一个整体，敏感度的计算是模型参数的L2范数作为指标衡量。LDP的联邦下，模型参数的每一个神经元权值看成一个LDP要保护的维度，每个神经元是串行的隐私关系。裁剪是针对每个单独神经元进行裁剪。
+或者没有客户端中心方做小批量梯度下降，一般这种场景一个客户端只有一个样本数据，如果有多个样本数据会训练多个梯度上传给联邦中心方
 
 | Title | Team/Main Author | Venue and Year | Key Description                                                                                                                                                                                                                                                                               
 | :------------| :------ | :---------- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | ESA:A Nove lPrivacy Preserving Framework | Renmin University of China | Journal of Computer Research and Development /2021 | 系统的介绍ESA框架（基于shuffle的LDP）及应用                                                                                                                                                                                                                                                                  | 
-| FLAME: Differentially Private Federated Learning in the Shuffle Model | Renmin University of China | AAAI/2021 | 提出了SS-Double协议，即通过随机采样的方式加shuffle(文章需要idx做标记，应该是对维度进行shuffle)双重隐私放大，通过数值填充的方式将采样提供的的隐私放大效应与混洗模型的隐私放大效应进行组合。扰动方式是对梯度编码然后随机扰动。整体框架基于ESA。                                                                                                                                                        | 
+| FLAME: Differentially Private Federated Learning in the Shuffle Model | Renmin University of China | AAAI/2021 | 这个是标准LDP结合联邦，裁剪是对每个神经元进行裁剪，隐私预算是分配到每个神经元上的。提出了SS-Double协议，即通过随机采样的方式加shuffle(文章需要idx做标记，应该是对维度进行shuffle)双重隐私放大，通过数值填充的方式将采样提供的的隐私放大效应与混洗模型的隐私放大效应进行组合。扰动方式是对梯度编码然后随机扰动。整体框架基于ESA。                                                                                                             | 
 | Shuffled Model of Differential Privacy in Federated Learning | Google | AISTATS/2021 | 提出了CLDP-SGD算法，先对客户端进行采样，再对客户端下的样本进行采样，最后对不同客户端的梯度shuffle，这里有多个样本梯度，客户端会传给中心方多个梯度，这边本地基于编码扰动进行加噪。                                                                                                                                                                                              
 | Shuffle Gaussian Mechanism for Differential Privacy | Seng Pei Liew | 2022 | 本地客户端进行高斯加噪后得到一个梯度，然后对不同客户端的梯度进行shuffle进行隐私放大。并用不放回随机采样和泊松采样的高斯机制结合shuffle进行理论证明（基于RDP）。                                                                                                                                                                                                      
 | The Privacy Blanket of the Shuffle Model | Borja Balle  | 2019 | 最为经典的shuffle证明。首先指出，对于shuffle模型，整个shuffle中的数据集应当看成整体，从而才有相邻数据集，针对这个数据集整体满足差分隐私。其次，采用数据相关和数据无关将整体数据分割成两部分，最大化敌手，使得最后只需要分析数据无关的部分，即隐私毯子，随机性在隐私毯子中。[【vedio】](https://www.bilibili.com/video/BV14W4y1b7VK?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3) 

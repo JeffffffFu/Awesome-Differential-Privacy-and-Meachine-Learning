@@ -1,3 +1,7 @@
+import os
+
+import pandas as pd
+
 from data.fed_data_distribution.pathological_nonIID_data import pathological_split_noniid
 from data.get_data import get_data
 from data.util.sampling import get_data_loaders_uniform_without_replace
@@ -23,12 +27,12 @@ from opacus import PrivacyEngine
 
 
 #opacus<=0.13.0
-def centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant):
+def centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_size, eps_budget, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant):
 
     #如果用Resent模型需要加以下，将模型转换为opacus支持的
-    from opacus.utils import module_modification
-    from opacus.dp_model_inspector import DPModelInspector
-    model = module_modification.convert_batchnorm_modules(model)
+    # from opacus.utils import module_modification
+    # from opacus.dp_model_inspector import DPModelInspector
+    # model = module_modification.convert_batchnorm_modules(model)
     # inspector = DPModelInspector()
     # print(f"Is the model valid? {inspector.validate(model)}")
 
@@ -66,9 +70,9 @@ def centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_si
         accountant=privacy_accoutant
     )
     privacy_engine.attach(optimizer)
-
-    for epoch in range(numEpoch):
-
+    epoch=1
+    while epsilon < eps_budget:
+        epoch+=1
         central_train_loss, central_train_accuracy = train_with_opacus(model, train_dl, optimizer,n_acc_steps)
         central_test_loss, central_test_accuracy = validation(model, test_dl)
 
@@ -88,7 +92,7 @@ def centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_si
 
 
 #opacus>=1.0.1
-def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant):
+def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_size, eps_budget, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant):
 
     from opacus.validators import ModuleValidator
     if not ModuleValidator.is_valid(model):
@@ -125,39 +129,70 @@ def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_s
         noise_multiplier=sigma,
         max_grad_norm=max_norm,
     )
+    epoch=1
+    eps_97=0.
+    label1=0
+    eps_98=0.
+    label2=0
+    eps_985=0.
+    label3=0
+    epsilon_list=[]
+    epsilon=0.
+    while epsilon < eps_budget:
 
-    for epoch in range(numEpoch):
-
-
+        epoch+=1
         central_train_loss, central_train_accuracy = train_privacy_opacus2(model_opacus, train_dl_opacus, optimizer_opacus)
         central_test_loss, central_test_accuracy = validation(model_opacus, test_dl)
 
         #下面的计算都是需要一个完整的epoch
         epsilon = privacy_engine.accountant.get_epsilon(delta=delta)
 
+        if central_train_accuracy>0.97 and label1==0:
+            eps_97=epsilon
+            label1=1
 
-        result_loss_list.append(central_test_loss)
-        result_acc_list.append(central_test_accuracy)
+        if central_train_accuracy>0.98 and label2==0:
+            eps_98=epsilon
+            label2=1
+
+        if central_train_accuracy>0.985 and label3==0:
+            eps_985=epsilon
+            label3=1
+
+        # result_loss_list.append(central_test_loss)
+        # result_acc_list.append(central_test_accuracy)
 
         print("privacy_accoutant:",privacy_accoutant+"| epoch: {:3.0f}".format(epoch + 1) + " | epsilon: {:7.4f}".format(
         epsilon)   )
+
+    File_Path_Csv = os.getcwd() + f"/result/csv/DPSGD/MNIST//"
+    if not os.path.exists(File_Path_Csv):
+        os.makedirs(File_Path_Csv)
+    pd.DataFrame([eps_97, eps_98, eps_985]).to_csv(
+        f"{File_Path_Csv}.csv", index=False, header=False)
 
 
     print("------ Training finished ------")
 
 if __name__=="__main__":
+    # python3
+    # cnns.py - -dataset = mnist - -batch_size = 512 - -lr = 0.5 - -noise_multiplier = 1.23
+    # python3
+    # cnns.py - -dataset = fmnist - -batch_size = 2048 - -lr = 4 - -noise_multiplier = 2.15
+    # python3
+    # cnns.py - -dataset = cifar10 - -batch_size = 1024 - -lr = 1 - -noise_multiplier = 1.54
 
     #train_data, test_data = get_data('cifar10', augment=False)
     train_data, test_data = get_data('mnist', augment=False)
    #  print(train_data.__dict__)
-    model = CNN_tanh()
+    model = CNN()
     #model= resnet20(10, False)  #含有batchNorm层的需要进行模型转换
     batch_size =512
-    learning_rate = 1.0
-    numEpoch = 1500
+    learning_rate = 0.5
+    eps_budget = 5.0
     sigma = 1.23
     momentum = 0.9
     delta = 10 ** (-5)
     max_norm =0.1
     privacy_accoutant='rdp' #rdp,gdp,prv(opacus>=1.3.0)
-    centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant)
+    centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_size, eps_budget, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant)

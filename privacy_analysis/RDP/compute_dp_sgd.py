@@ -52,9 +52,9 @@ def apply_dp_sgd_analysis(q, sigma, steps, orders, delta):
    #   eps, delta))
   #print('The optimal RDP order is {}.'.format(opt_order))
 
-  if opt_order == max(orders) or opt_order == min(orders):            #这个是一个提示可以忽略，主要告诉我们可以扩展我们的orders的范围
-    print('The privacy estimate is likely to be improved by expanding '
-          'the set of orders.')
+  # if opt_order == max(orders) or opt_order == min(orders):            #这个是一个提示可以忽略，主要告诉我们可以扩展我们的orders的范围
+  #   print('The privacy estimate is likely to be improved by expanding '
+  #         'the set of orders.')
 
   return eps, opt_order
 
@@ -71,10 +71,10 @@ def apply_dp_sgd_analysis_old(q, sigma, steps, orders, delta):
 
   eps, opt_order = compute_eps(orders, rdp, delta)    #再根据RDP转换为对应的最佳eps和lamda
 
-
-  if opt_order == max(orders) or opt_order == min(orders):            #这个是一个提示可以忽略，主要告诉我们可以扩展我们的orders的范围
-    print('The privacy estimate is likely to be improved by expanding '
-          'the set of orders.')
+  #
+  # if opt_order == max(orders) or opt_order == min(orders):            #这个是一个提示可以忽略，主要告诉我们可以扩展我们的orders的范围
+  #   print('The privacy estimate is likely to be improved by expanding '
+  #         'the set of orders.')
 
   return eps, opt_order
 
@@ -89,6 +89,7 @@ print("eps:",format(eps)+"| order:",format(opt_order))
 #cifar10(EPS=7.53) 只有50000个样本  这边用0.7的sigma不行，训练次数只有8000这样，准确率大概50%。 0.8，20430。后面考虑用0.8的sigma。
 #注意下面的采样率
 if __name__=="__main__":
-    orders = (list(range(2, 64)) + [128, 256, 512])  # 默认的lamda
-    eps, opt_order = apply_dp_sgd_analysis(500 / 50000, 1.1, 1000, orders, 10 ** (-5))
+    orders = [1 + x / 10.0 for x in range(1, 100)] + list(range(11, 64))+ [128, 256, 512]
+
+    eps, opt_order = apply_dp_sgd_analysis(512 / 60000, 0.01, 1, orders, 10 ** (-5))
     print("eps:", format(eps) + "| order:", format(opt_order))
