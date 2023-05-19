@@ -5,7 +5,7 @@ import pandas as pd
 from data.fed_data_distribution.pathological_nonIID_data import pathological_split_noniid
 from data.get_data import get_data
 from data.util.sampling import get_data_loaders_uniform_without_replace
-from model.CNN import CNN_tanh, CNN, Cifar10CNN
+from model.CNN import CNN_tanh, CNN, Cifar10CNN, Cifar10CNN_tanh
 from model.ResNet import resnet20
 from optimizer.dp_optimizer import DPSGD, DPAdam
 import torch
@@ -98,7 +98,7 @@ def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_s
     if not ModuleValidator.is_valid(model):
         model = ModuleValidator.fix(model)
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=momentum)
 
     # 包装抽样函数
     minibatch_size = batch_size  # 这里比较好的取值是根号n，n为每个客户端的样本数
@@ -147,15 +147,15 @@ def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_s
         #下面的计算都是需要一个完整的epoch
         epsilon = privacy_engine.accountant.get_epsilon(delta=delta)
 
-        if central_train_accuracy>0.97 and label1==0:
+        if central_test_accuracy>97.0 and label1==0:
             eps_97=epsilon
             label1=1
 
-        if central_train_accuracy>0.98 and label2==0:
+        if central_test_accuracy>98.0 and label2==0:
             eps_98=epsilon
             label2=1
 
-        if central_train_accuracy>0.985 and label3==0:
+        if central_test_accuracy>98.5 and label3==0:
             eps_985=epsilon
             label3=1
 

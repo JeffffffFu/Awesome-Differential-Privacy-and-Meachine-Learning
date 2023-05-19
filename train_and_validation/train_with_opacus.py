@@ -65,7 +65,7 @@ def train_privacy_opacus2(model, train_loader, optimizer):
     train_loss = 0.0
     correct = 0
     from opacus.utils.batch_memory_manager import BatchMemoryManager
-    MAX_PHYSICAL_BATCH_SIZE=1024
+    MAX_PHYSICAL_BATCH_SIZE=2048
 
     #使用BatchMemoryManager,将逻辑批处理量（定义了模型的更新频率和DP噪声的添加量）和物理批处理量（定义了我们一次处理多少个样本）分开。
     #使用BatchMemoryManager，将用一个逻辑批处理大小来创建你的DataLoader，然后向内存管理器提供最大的物理批处理大小MAX_PHYSICAL_BATCH_SIZE
@@ -79,6 +79,7 @@ def train_privacy_opacus2(model, train_loader, optimizer):
         for data, target in memory_safe_data_loader:  # batch之前组装到data数据集里的,pytorch的MBDG统一用这种方式进行,会按序列一个个btach训练
             optimizer.zero_grad()  # 梯度清空
             output = model(data.to(torch.float32))  # 这要是这里要做升维
+
             loss = F.cross_entropy(output, target)  # 定义损失
             loss.backward()  # 梯度求导
             optimizer.step()  # 参数优化更新
