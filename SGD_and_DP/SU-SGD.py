@@ -33,7 +33,7 @@ def centralization_train(train_dataset, test_data, batch_size, model, numEpoch, 
 
     #按照batch_size去分训练数据
     #这里默认作MBSGD，如果想改成BSGD，batchsize=总样本数量即可，如果想改成SGD，batchsize=1即可
-    # train_dl = torch.utils.data.DataLoader(
+    # train_dl = torch.example.data.DataLoader(
     #     train_data, batch_size=batch_size, shuffle=True)
 
 

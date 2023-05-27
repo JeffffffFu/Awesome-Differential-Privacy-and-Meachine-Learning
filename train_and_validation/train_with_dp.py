@@ -37,7 +37,7 @@ def train_dynamic_add_noise(model, train_loader, optimizer):
     return train_loss, train_acc  # 返回平均损失和平均准确率
 
 
-def train_dynamic_add_noise_geo(model, train_loader, optimizer):
+def train_dynamic_add_noise_geo_full_batch(model, train_loader, optimizer):
     '''
     Args:
         model:
@@ -52,7 +52,7 @@ def train_dynamic_add_noise_geo(model, train_loader, optimizer):
     aa = 0
     train_acc = 0.
     i = 0
-    for id, data in enumerate(train_loader): # TODO per-sample computation for mini-batch
+    for id, data in enumerate(train_loader):  # TODO per-sample computation for mini-batch
         # X_microbatch = data
         # y_microbatch = data.y
         optimizer.zero_accum_grad()  # 梯度清空
@@ -67,6 +67,77 @@ def train_dynamic_add_noise_geo(model, train_loader, optimizer):
         optimizer.microbatch_step()  # 这个step做的是每个样本的梯度裁剪和梯度累加的操作
         optimizer.step_dp()  # 这个做的是梯度加噪和梯度平均更新下降的操作
         train_loss += loss
+    return train_loss, train_acc  # 返回平均损失和平均准确率
+
+
+def train_dynamic_add_noise_geo_mini_batch(model, train_loader, optimizer):
+    '''
+    Args:
+        model:
+        train_loader: PyG DataLoader
+        optimizer:
+
+    Returns:
+
+    '''
+    model.train()
+    train_loss = 0.0
+    aa = 0
+    train_acc = 0.
+    i = 0
+    criterion = torch.nn.CrossEntropyLoss()
+
+    for id, data in enumerate(train_loader):  # TODO per-sample computation for mini-batch
+        optimizer.zero_accum_grad()  # 梯度清空
+        for id in range(data.num_graphs):
+            data_microbatch = data[id]
+            optimizer.zero_microbatch_grad()
+            # out = model(data_microbatch.x, data_microbatch.edge_index, data_microbatch.batch)
+            out = model(data_microbatch.x, data_microbatch.edge_index, torch.tensor([0], dtype=torch.int64))
+            loss = criterion(out, data_microbatch.y)
+            loss.backward()  # 梯度求导，这边求出梯度
+            optimizer.microbatch_step()  # 这个step做的是每个样本的梯度裁剪和梯度累加的操作
+        optimizer.step_dp()  # 这个做的是梯度加噪和梯度平均更新下降的操作
+        train_loss += loss
+    return train_loss, train_acc  # 返回平均损失和平均准确率
+
+
+def train_dynamic_add_noise_geo_uniform_batch(model, train_loader, optimizer, criterion, full_batch=False):
+    '''
+    Args:
+        model:
+        train_loader: PyG DataLoader
+        optimizer:
+
+    Returns:
+
+    '''
+    model.train()
+    train_loss = 0.0
+    aa = 0
+    train_acc = 0.
+    i = 0
+
+    for id, data in enumerate(train_loader):  # TODO per-sample computation for mini-batch
+        optimizer.zero_accum_grad()  # 梯度清空
+        if not full_batch: # pre-sample计算
+            for id in range(data.num_graphs):
+                data_microbatch = data[id]
+                optimizer.zero_microbatch_grad()
+                # out = model(data_microbatch.x, data_microbatch.edge_index, data_microbatch.batch)
+                out = model(data_microbatch)
+                loss = criterion(out, data_microbatch.y)
+                loss.backward()  # 梯度求导，这边求出梯度
+                optimizer.microbatch_step()  # 这个step做的是每个样本的梯度裁剪和梯度累加的操作
+                train_loss += loss.item()
+        else:
+            optimizer.zero_microbatch_grad()
+            output = model(data)
+            loss = criterion(output, data.y)
+            loss.backward()  # 梯度求导，这边求出梯度
+            optimizer.microbatch_step()  # 这个step做的是每个样本的梯度裁剪和梯度累加的操作
+            train_loss += loss
+        optimizer.step_dp()  # 这个做的是梯度加噪和梯度平均更新下降的操作
     return train_loss, train_acc  # 返回平均损失和平均准确率
 
 

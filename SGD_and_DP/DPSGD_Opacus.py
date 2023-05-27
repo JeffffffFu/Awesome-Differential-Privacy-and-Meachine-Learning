@@ -30,7 +30,7 @@ from opacus import PrivacyEngine
 def centralization_train_with_dp_by_opacus(train_data, test_data, model,batch_size, eps_budget, learning_rate,momentum,delta,max_norm,sigma,privacy_accoutant):
 
     #如果用Resent模型需要加以下，将模型转换为opacus支持的
-    # from opacus.utils import module_modification
+    # from opacus.example import module_modification
     # from opacus.dp_model_inspector import DPModelInspector
     # model = module_modification.convert_batchnorm_modules(model)
     # inspector = DPModelInspector()

@@ -84,7 +84,7 @@ def get_data_loaders_uniform_without_replace(minibatch_size, microbatch_size, it
                 # DataLoader中自定义从数据集中取样本的策略
             )
         else:
-            return GeoDataLoader(dataset)
+            return GeoDataLoader(dataset, batch_size=minibatch_size)
 
     # 最里面一层的data，对上面组装好的minibatch进行操作，主要目的是将每个minibatch细分成多个microbatch
     # 这个不是关键，主要的是上面的采样

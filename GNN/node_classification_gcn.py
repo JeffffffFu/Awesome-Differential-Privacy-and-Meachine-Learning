@@ -34,7 +34,7 @@ def main(differentially_private=True):
     train_loader = DataLoader(dataset, batch_size=32, num_workers=0, shuffle=True)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)  # 使用Adam，weight_decay其实就是L2正则化
     model.train()  # 进入训练模式，和evaluate模式不同的是，evaluate模式会将很多参数的gradient置为不可求导
-    for epoch in range(200):
+    for epoch in range(10):
         for index, data in enumerate(train_loader):
             data = data.to(device)
             optimizer.zero_grad()  # optimizer的梯度需要置0的原因
