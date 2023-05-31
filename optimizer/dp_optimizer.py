@@ -20,6 +20,15 @@ from privacy_analysis.RDP.compute_dp_sgd import apply_dp_sgd_analysis
 def make_optimizer_class(cls):
     class DPOptimizerClass(cls):
         def __init__(self, l2_norm_clip, noise_multiplier, minibatch_size, microbatch_size, *args, **kwargs):
+            '''给模型参数添加accum_grads属性；添加DP相关的参数作为属性
+            Args:
+                l2_norm_clip: C
+                noise_multiplier: sigma
+                minibatch_size: the minibatch of the data for update
+                microbatch_size: TODO what is this?
+                *args:
+                **kwargs:
+            '''
             # args表示剩余参数的值，kwargs在args之后表示成对键值对。
 
             super(DPOptimizerClass, self).__init__(*args, **kwargs)
@@ -30,6 +39,7 @@ def make_optimizer_class(cls):
             self.minibatch_size = minibatch_size  #batch_size
 
             for id,group in enumerate(self.param_groups):
+                # 遍历所有参数，筛出需要求梯度的参数，生成和这些参数同形状的全0矩阵。为group新生成一个属性accum_grads用来存储这个全0矩阵
                 group['accum_grads'] = [torch.zeros_like(param.data) if param.requires_grad else None for param in group['params']]
                 # print("accum_grad:",  group['accum_grads'])
                 # print("id:",len(group['accum_grads']))
