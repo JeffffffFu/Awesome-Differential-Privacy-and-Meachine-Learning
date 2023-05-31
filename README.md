@@ -23,6 +23,7 @@ bilibili（论文分享）:https://space.bilibili.com/80356866/video
   - [DP and Meachine Learning](#dp-and-meachine-learning)  
     - [Meachine Leaning](#meachine-learning)
     - [Meachine Leaning with DP](#meachine-learning-with-dp)
+    - [GNN with DP](#gnn-with-dp)
   - [DP and Federated Leaning](#dp-and-federated-learning)  
     - [Federated Leaning](#federated-leaning) 
     - [Horizontal FL with DP](#horizontal-fl-with-dp)
@@ -144,6 +145,12 @@ TO DO
 | Local Differential Privacy for Deep Learning                                                    | RMIT University | IEEE Internet of Things/2020                        | 本篇文章给出了在下采样和池化层之后，对数据特征进行扰动，在进行全连接层之前进行扰动。比较核心在于对整个梯度进行编码，利用十进制转二进制，在进行比特的扰动。后文引入的优化方法的参数a存在偷换概念的问题，相当于引入了一个新的隐私预算，但是缺忽视掉了。                                                                                                                           | 
 | Differential Privacy Meets Neural Network Pruning                                                    | Kamil Adamczewski                           | arxiv/2023                                          | 文章将传统按权值剪枝的技术和DPSGD进行结合，确定剪枝的mask是通过公共数据集得到的。进行DPSGD结合有两点好处，一是在进行裁剪的时候，只对参与训练的神经元进行裁剪，也就是减少了裁剪幅度，也相当于double clip。其二加噪声时，只对参与训练的神经元加噪，这样减少了噪声对模型的影响，尤其在大模型下。                                                                                           | 
 
+### GNN with DP
+| Title                                                                                           | Team/Main Author | Venue and Year      | Key Description                                                                                            
+|:------------------------------------------------------------------------------------------------|:-----------------|:--------------------|:-----------------------------------------------------------------------------------------------------------
+| GAP: Differentially Private Graph Neural Networks with Aggregation Perturbation                                                         | Sina Sajadmanesh | USENIX/2023         | 在非端到端的图机器学习中，提出边级别和节点级别的图差分隐私。其主要想法是在消息传递，即特征聚合的时候利用CDP的概念进行加噪，在聚合前进行特征归一化从而获得每个节点特征的l2范数的bound，以获得敏感度。    | 
+| Node-Level Differentially Private Graph Neural Networks                                                        | Google           | ICLR(workshop)/2022 | 将DPSGD应用到图的节点分类任务，主要是限制图的最大度，从而利用N叉树的总节点个数去算出每个节点在K跳的情况下影响到多少个节点的gradient，从而确定敏感度。并有一个针对这个场景的新的采样放大的隐私预算推导 | 
+
 ## DP and Federated Learning
 
 ### Federated Leaning
@@ -214,13 +221,14 @@ TO DO
 
 [视觉算法的模型攻防](https://www.bilibili.com/video/BV1C34y1n7vV?spm_id_from=333.999.0.0)
 
-| Title                                                                                   | Team/Main Author           | Venue and Year                                  | Key Description                                                                                                                   
-|:----------------------------------------------------------------------------------------|:---------------------------|:------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------
-| Deep leakage from gradient                                                              | Renmin University of China | Neurips /2019                                   | 先用虚拟的数据和标签得到虚拟模型梯度，计算虚拟模型梯度和真正的梯度之间的L2损失，损失求导使得虚拟梯度拟合真实梯度，从而使得虚拟数据和虚拟标签同步变化，最后复现出原始数据。该方案仅适用于单层网络模型。                              | 
-| Towards Security Threats of Deep Learning Systems: A Survey                             | Yingzhe He                 | IEEE Transactions on Software Engineering /2021 | 深度学习下的攻击综述，包括模型窃取攻击，模型反演攻击，投毒攻击，对抗性样本攻击                                                                                           |                                                                                               | 
-| Local and Central Differential Privacy for Robustness and Privacy in Federated Learning | Openmind                   | NDSS /2021                                      | 联邦场景下LDP（其实是联邦下的样本级差分隐私）和CDP（联邦下的客户端级差分隐私）对推理攻击（隐私性）和后门攻击（鲁棒性）的防御研究，内有大量实验设置和对比结果。DP之所以能防御后门攻击可能在于加DP的同时同步给置入后门的攻击方加了噪声，削弱了攻击方能力。 |                                                                                               | 
-| Comprehensive Privacy Analysis of Deep Learning | University of Massachusetts Amherst                   | NDSS /2018                                     | 在联邦场景下假设联邦中心方或其他参与方是敌手的情况下的成员推理攻击，并分了无监督，半监督，白盒，黑盒，积极攻击，消极攻击等多种场景。主要在于它的成员推理攻击比较普适，攻击的模型思想比较清晰。                                   |                                                                                               | 
-| Evaluating Differentially Private Machine Learning in Practice       | openmind            | CCS /2019                                     | 对不同的DP（高级组合，ZCDP，RDP等）进行评估，用黑盒和白盒的成员推理攻击来评估经过这些DP训练后的模型的防御效果。                                                                     |                                                                                              
+| Title                                                                                   | Team/Main Author           | Venue and Year                                  | Key Description                                                                                                                                                              
+|:----------------------------------------------------------------------------------------|:---------------------------|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Deep leakage from gradient                                                              | Renmin University of China | Neurips /2019                                   | 先用虚拟的数据和标签得到虚拟模型梯度，计算虚拟模型梯度和真正的梯度之间的L2损失，损失求导使得虚拟梯度拟合真实梯度，从而使得虚拟数据和虚拟标签同步变化，最后复现出原始数据。该方案仅适用于单层网络模型。                                                                         | 
+| Towards Security Threats of Deep Learning Systems: A Survey                             | Yingzhe He                 | IEEE Transactions on Software Engineering /2021 | 深度学习下的攻击综述，包括模型窃取攻击，模型反演攻击，投毒攻击，对抗性样本攻击                                                                                                                                      |                                                                                               | 
+| Local and Central Differential Privacy for Robustness and Privacy in Federated Learning | Openmind                   | NDSS /2021                                      | 联邦场景下LDP（其实是联邦下的样本级差分隐私）和CDP（联邦下的客户端级差分隐私）对推理攻击（隐私性）和后门攻击（鲁棒性）的防御研究，内有大量实验设置和对比结果。DP之所以能防御后门攻击可能在于加DP的同时同步给置入后门的攻击方加了噪声，削弱了攻击方能力。                                            |                                                                                               | 
+| Comprehensive Privacy Analysis of Deep Learning | University of Massachusetts Amherst                   | NDSS /2018                                      | 在联邦场景下假设联邦中心方或其他参与方是敌手的情况下的成员推理攻击，并分了无监督，半监督，白盒，黑盒，积极攻击，消极攻击等多种场景。主要在于它的成员推理攻击比较普适，攻击的模型思想比较清晰。                                                                              |                                                                                               | 
+| Evaluating Differentially Private Machine Learning in Practice       | openmind            | CCS /2019                                       | 对不同的DP（高级组合，ZCDP，RDP等）进行评估，用黑盒和白盒的成员推理攻击来评估经过这些DP训练后的模型的防御效果。                                                                                                                |                                                                                              
+| FLAME: Taming Backdoors in Federated Learning       | Technical University of Darmstadt            | USENIX /2022                                    | 在差分隐私结合联邦场景中提出了FLAME， 使用模型聚类（基础假设为后门训练的权重和良性权重存在较大的方向偏差）和权重裁剪（采用中位数进行裁剪，基础假设是后门敌手不会超过总客户端的一半）方法。这确保了 FLAME 可以在有效消除对抗性后门的同时保持聚合模型的良性性能。实验表明加很少的噪声就可以非常有效的抵御后门攻击，应该是裁剪对后门的作用大。 |                                                                                              
 
 ## Application Scenarios
 
