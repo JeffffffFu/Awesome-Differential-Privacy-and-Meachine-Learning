@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torchvision
+from sympy.physics.quantum.identitysearch import scipy
 from torch.utils.data import TensorDataset, DataLoader
 
 from data.util.custom_tensor_dataset import CustomTensorDataset
@@ -47,5 +48,34 @@ def test2():
     result = len(list(filter(lambda x: x < threshold, listE)))
     print(result)
 
+
+def test3():
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from scipy.stats import hypergeom
+
+    # 定义超几何分布的参数
+    N = 9  # 总体的大小
+    K = 5  # 总体中具有某种属性的物件数量
+    n = 8 # 进行抽样的样本数量
+
+    # 创建超几何分布对象
+    hypergeom_dist = hypergeom(N, K, n)
+
+    # 生成可能的成功事件数量范围
+    x = np.arange(0, n + 1)
+
+    # 计算每个成功事件数量的概率
+    pmf = hypergeom_dist.pmf(x)
+
+    # 绘制超几何分布的概率质量函数图像
+    plt.plot(x, pmf, marker='o', linestyle='-')
+    plt.xlabel('x')
+    plt.ylabel('p')
+    plt.title('Hypergeom')
+    plt.show()
+
+
+
 if __name__=="__main__":
-    test2()
+    test3()

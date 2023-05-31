@@ -21,9 +21,7 @@ def train(model, train_loader, optimizer):
         #     print("测试集：",data[0]) #这边同样DPSGD的验证集也是浮点型的
         optimizer.zero_grad()  # 梯度清空
         output = model(data.to(torch.float32))  # 计算输出
-        print(f'id:{id}', f'| output:{output}')
         loss = F.cross_entropy(output, target.to(torch.long))  # 损失函数
-        print(f'id:{id}',f'| loss:{loss}')
         loss.backward()  # 梯度求导
         optimizer.step()  # 参数优化更新
 

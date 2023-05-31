@@ -14,12 +14,15 @@ from model.CNN import CNN, Cifar10CNN, CIFAR10_CNN, CNN_tanh
 from data.util.sampling import get_data_loaders_uniform_without_replace, get_data_loaders_possion
 from model.DNN import DNN
 from model.ResNet import resnet20
+from model.classifer import Classifier
 from model.vgg_bn import vgg19_bn
 from train_and_validation.train import train
 from train_and_validation.validation import validation
 
 def centralization_train(train_dataset, test_data, batch_size, model, numEpoch, learning_rate):
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=0.9)
+    #optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=0.9)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
     # scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, verbose=True,
     #                                                  threshold=0.00005, threshold_mode='rel', cooldown=0, min_lr=0,
     #                                                  eps=1e-08)
@@ -36,9 +39,11 @@ def centralization_train(train_dataset, test_data, batch_size, model, numEpoch, 
     test_dl = torch.utils.data.DataLoader(
         test_data, batch_size=batch_size, shuffle=False)
 
+    minibatch_loader, microbatch_loader = get_data_loaders_uniform_without_replace(minibatch_size=batch_size,microbatch_size=1,iterations=1)
+
     print("------ Centralized Model ------")
     for epoch in range(numEpoch):
-        # train_dl = minibatch_loader(train_data)
+        train_dl = minibatch_loader(train_data)
 
         central_train_loss, central_train_accuracy = train(model, train_dl,optimizer)
 
@@ -57,5 +62,5 @@ if __name__=="__main__":
     #model= resnet20(10, False)
     batch_size=256
     learning_rate = 0.001
-    numEpoch = 10
+    numEpoch = 100
     centralization_train(train_data, test_data, batch_size, model, numEpoch, learning_rate)

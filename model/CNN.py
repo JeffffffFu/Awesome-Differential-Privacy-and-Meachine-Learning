@@ -32,6 +32,7 @@ class CNN(nn.Module):
         x=self.conv(x)
         return x
 
+
 #基于文章《Tempered Sigmoid Activations for Deep Learning with Differential Privacy》将激活函数改为Tanh
 class CNN_tanh(nn.Module):
     def __init__(self):
