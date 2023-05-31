@@ -51,7 +51,15 @@ def train_val_test_split(subgraphs):
     return train_subgraphs, val_subgraphs, test_subgraphs
 
 
-def main(batch_size, k_hop, max_norm, target_delta, max_terms_per_node, sigma, learning_rate, momentum):
+def compute_max_terms_per_node(num_message_passing_steps, max_node_degree):
+    if num_message_passing_steps == 1:
+        return max_node_degree + 1
+
+    if num_message_passing_steps == 2:
+        return max_node_degree ** 2 + max_node_degree + 1
+
+
+def main(batch_size, k_hop, max_norm, target_delta, max_terms_per_node, max_degree, sigma, learning_rate, momentum):
     # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     device = 'cpu'
     # model = GCN(16, 2, dataset.num_node_features, dataset.num_classes).to(device)  # 模型复制到device上（就是参数需要复制）
@@ -60,7 +68,7 @@ def main(batch_size, k_hop, max_norm, target_delta, max_terms_per_node, sigma, l
     data = dataset[0]
     from GNN.utils import extract_node_subgraphs
     import GNN.sampler as sampler
-    data = sampler.subsample_graph(data, max_degree=5)
+    data = sampler.subsample_graph(data, max_degree=max_degree)
     subgraphs = extract_node_subgraphs(data, k_hop, "cora")
     train_subgraphs, val_subgraphs, test_subgraphs = train_val_test_split(subgraphs)
     # train_loader = DataLoader(data, batch_size=batch_size, num_workers=0, shuffle=True)
@@ -85,7 +93,8 @@ def main(batch_size, k_hop, max_norm, target_delta, max_terms_per_node, sigma, l
         train_batch_subgraphs = [train_subgraphs[i] for i in indices]
         train_loader = DataLoader(train_batch_subgraphs, batch_size=batch_size, num_workers=0, shuffle=False)
         from train_and_validation.train_with_dp import train_dynamic_add_noise_geo_uniform_batch
-        train_loss, train_acc = train_dynamic_add_noise_geo_uniform_batch(model, train_loader, optimizer, criterion,full_batch=False)
+        train_loss, train_acc = train_dynamic_add_noise_geo_uniform_batch(model, train_loader, optimizer, criterion,
+                                                                          full_batch=False)
         # train_loss, train_acc = train_dynamic_add_noise_geo_uniform_batch(model, train_loader, optimizer, criterion,
         #                                                                   full_batch=True)
         print(f"epoch:{epoch}, total loss:{train_loss}")
@@ -94,6 +103,7 @@ def main(batch_size, k_hop, max_norm, target_delta, max_terms_per_node, sigma, l
         from privacy_analysis.RDP.compute_multiterm_rdp import compute_multiterm_rdp
         from privacy_analysis.RDP.rdp_convert_dp import compute_eps
         orders = np.arange(1, 10, 0.1)[1:]
+        max_terms_per_node = compute_max_terms_per_node(num_message_passing_steps=2, max_node_degree=5)
         rdp_every_epoch = compute_multiterm_rdp(orders, epoch, sigma, len(train_subgraphs),
                                                 max_terms_per_node, batch_size)
         epsilon, best_alpha = compute_eps(orders, rdp_every_epoch, target_delta)
@@ -116,6 +126,7 @@ if __name__ == "__main__":
     delta = 10 ** (-5)
     max_norm = 0.1
     max_terms_per_node = 20
+    max_degree = 5
     target_delta = 1e-5
 
     # learning_rate = 0.5
@@ -133,5 +144,6 @@ if __name__ == "__main__":
          sigma=sigma,
          target_delta=target_delta,
          max_terms_per_node=max_terms_per_node,
+         max_degree=max_degree,
          learning_rate=learning_rate,
          momentum=momentum)

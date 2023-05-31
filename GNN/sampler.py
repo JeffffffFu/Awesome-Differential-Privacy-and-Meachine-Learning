@@ -21,6 +21,14 @@ def get_adjacency_lists(dataset: Data):
     return edges
 
 
+def get_adjacency_lists_ogb(graph: torch.Tensor):
+    ids = graph.unique().tolist()
+    edges = {u: [] for u in ids}
+    for u, v in graph.T.tolist():
+        edges[u].append(v)
+    return edges
+
+
 def sample_adjacency_lists(edges, train_nodes,
                            max_degree):
     """Statelessly samples the adjacency lists with in-degree constraints.
@@ -79,9 +87,11 @@ def sample_adjacency_lists(edges, train_nodes,
             sampled_edges[u] = edges[u]
     return sampled_edges
 
-def get_train_indices(graph:Data):
+
+def get_train_indices(graph: Data):
     indices = torch.where(graph.train_mask)[0].tolist()
     return indices
+
 
 def subsample_graph(graph: Data, max_degree):
     edges = get_adjacency_lists(graph)
@@ -96,4 +106,28 @@ def subsample_graph(graph: Data, max_degree):
             receivers.append(v)
     edge_index = torch.tensor([senders, receivers])
     graph.edge_index = edge_index
+    return graph
+
+
+def subsample_graph_ogb(graph: torch.Tensor, max_degree):
+    edges = get_adjacency_lists_ogb(graph)
+    tmp = [len(l) for l in edges.values()]
+    max_degree = np.max([len(l) for l in edges.values()])
+    train_indices = graph.unique().tolist()
+    edges = sample_adjacency_lists(edges, train_indices, max_degree)
+    senders = []
+    receivers = []
+    for u in edges:
+        for v in edges[u]:
+            senders.append(u)
+            receivers.append(v)
+    edge_index = torch.tensor([senders, receivers])
+    graph = edge_index
+    return graph
+
+
+def subsample_graph_for_undirected_graph(graph, max_degree):
+    graph = subsample_graph_ogb(graph, max_degree)
+    graph = graph[[1, 0]]
+    graph = subsample_graph_ogb(graph, max_degree)
     return graph

@@ -35,7 +35,6 @@ def compute_multiterm_rdp(orders, num_training_steps, noise_multiplier, num_samp
     amplified_rdps_total = amplified_rdps * num_training_steps
     return amplified_rdps_total
 
-
 if __name__ == "__main__":
     # orders = (list(range(2, 64)) + [128, 256, 512])  # 默认的lamda
     orders = np.arange(1, 10, 0.1)[1:]
