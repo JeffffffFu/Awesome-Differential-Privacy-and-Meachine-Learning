@@ -62,7 +62,7 @@ class SEALDataset(InMemoryDataset):
         if self.percent == 100:
             name = 'SEAL_{}_data'.format(self.split)
         else:
-            name = 'SEAL_{}_data_{}'.format(self.split, self.percent)
+            name = 'SEAL_{}_data_{}_dp'.format(self.split, self.percent)
         name += '.pt'
         return [name]
 
@@ -77,8 +77,8 @@ class SEALDataset(InMemoryDataset):
             pos_edge = to_undirected(pos_edge)
         if not is_undirected(neg_edge):
             neg_edge = to_undirected(neg_edge)
-        pos_edge = subsample_graph_for_undirected_graph(pos_edge, 5)
-        neg_edge = subsample_graph_for_undirected_graph(neg_edge, 5)
+        pos_edge = subsample_graph_for_undirected_graph(pos_edge, max_degree=args.max_node_degree)
+        neg_edge = subsample_graph_for_undirected_graph(neg_edge, max_degree=args.max_node_degree)
 
         if self.use_coalesce:  # compress mutli-edge into edge with weight
             self.data.edge_index, self.data.edge_weight = coalesce(
@@ -232,6 +232,32 @@ def compute_max_terms_per_node(num_message_passing_steps, max_node_degree):
     if num_message_passing_steps == 2:
         return max_node_degree ** 2 + max_node_degree
 
+    if num_message_passing_steps == 3:
+        return max_node_degree ** 3 + max_node_degree * 2 + max_node_degree
+
+
+def compute_base_sensitivity(num_message_passing_steps, max_degree):
+    """Returns the base sensitivity which is multiplied to the clipping threshold.
+
+    Args:
+
+    """
+
+    num_message_passing_steps = num_message_passing_steps
+    max_node_degree = max_degree
+
+    if num_message_passing_steps == 1:
+        return float(2 * (max_node_degree + 1))
+
+    if num_message_passing_steps == 2:
+        return float(2 * (max_node_degree ** 2 + max_node_degree + 1))
+
+    if num_message_passing_steps == 3:
+        return float(2 * (max_node_degree ** 3 + max_node_degree * 2 + max_node_degree))
+
+    # We only support MLP and upto 2-layer GNNs.
+    raise ValueError('Not supported for num_message_passing_steps > 2.')
+
 
 def train():
     model.train()
@@ -247,7 +273,8 @@ def train():
     from privacy_analysis.RDP.compute_multiterm_rdp import compute_multiterm_rdp
     from privacy_analysis.RDP.rdp_convert_dp import compute_eps
     orders = np.arange(1, 10, 0.1)[1:]
-    max_terms_per_node = compute_max_terms_per_node(num_message_passing_steps=2, max_node_degree=5)
+    max_terms_per_node = compute_max_terms_per_node(num_message_passing_steps=args.num_layers,
+                                                    max_node_degree=args.max_node_degree)
     rdp_every_epoch = compute_multiterm_rdp(orders, epoch, sigma, len(train_dataset),
                                             max_terms_per_node, args.batch_size)
 
@@ -257,7 +284,7 @@ def train():
     epsilon_org, best_alpha_org = compute_eps(orders, rdp_every_epoch_org, target_delta)
     print("epoch: {:3.0f}".format(epoch) + " | epsilon: {:10.7f}".format(
         epsilon) + " | best_alpha: {:7.4f}".format(best_alpha))
-    print("epoch: {:3.0f}".format(epoch) + " | epsilon: {:10.7f}".format(
+    print("epoch: {:3.0f}".format(epoch) + " | epsilon_org: {:10.7f}".format(
         epsilon_org) + " | best_alpha: {:7.4f}".format(best_alpha_org))
     return train_loss
 
@@ -426,11 +453,11 @@ parser.add_argument('--fast_split', action='store_true',
 # GNN settings
 parser.add_argument('--model', type=str, default='GCN')
 parser.add_argument('--sortpool_k', type=float, default=0.6)
-parser.add_argument('--num_layers', type=int, default=2)
+parser.add_argument('--num_layers', type=int, default=3)
 parser.add_argument('--hidden_channels', type=int, default=32)
-parser.add_argument('--batch_size', type=int, default=20000)
+parser.add_argument('--batch_size', type=int, default=512)
 # Subgraph extraction settings
-parser.add_argument('--num_hops', type=int, default=1)
+parser.add_argument('--num_hops', type=int, default=3)
 parser.add_argument('--ratio_per_hop', type=float, default=1.0)
 parser.add_argument('--max_nodes_per_hop', type=int, default=None)
 parser.add_argument('--node_label', type=str, default='drnl',
@@ -448,13 +475,19 @@ parser.add_argument('--runs', type=int, default=1)
 # parser.add_argument('--train_percent', type=float, default=100)
 # parser.add_argument('--val_percent', type=float, default=100)
 # parser.add_argument('--test_percent', type=float, default=100)
-parser.add_argument('--train_percent', type=float, default=15)
-parser.add_argument('--val_percent', type=float, default=15)
-parser.add_argument('--test_percent', type=float, default=15)
-parser.add_argument('--dynamic_train', action='store_true',
+parser.add_argument('--train_percent', type=float, default=1)
+parser.add_argument('--val_percent', type=float, default=1)
+parser.add_argument('--test_percent', type=float, default=1)
+# parser.add_argument('--dynamic_train', action='store_true',
+#                     help="dynamically extract enclosing subgraphs on the fly")
+parser.add_argument('--dynamic_train', default=True,
                     help="dynamically extract enclosing subgraphs on the fly")
-parser.add_argument('--dynamic_val', action='store_true')
-parser.add_argument('--dynamic_test', action='store_true')
+# parser.add_argument('--dynamic_val', action='store_true')
+parser.add_argument('--dynamic_val', default=True,
+                    help="dynamically extract enclosing subgraphs on the fly")
+# parser.add_argument('--dynamic_test', action='store_true')
+parser.add_argument('--dynamic_test', default=True,
+                    help="dynamically extract enclosing subgraphs on the fly")
 parser.add_argument('--num_workers', type=int, default=16,
                     help="number of workers for dynamic mode; 0 if not dynamic")
 parser.add_argument('--train_node_embedding', action='store_true',
@@ -479,6 +512,7 @@ parser.add_argument('--test_multiple_models', action='store_true',
                     help="test multiple models together")
 parser.add_argument('--use_heuristic', type=str, default=None,
                     help="test a link prediction heuristic (CN or AA)")
+parser.add_argument('--max_node_degree', type=int, default=5)
 args = parser.parse_args()
 
 if args.save_appendix == '':
@@ -730,15 +764,17 @@ if __name__ == "__main__":
 
         learning_rate = 0.5
         numEpoch = 15000
-        sigma = 1.0
+        sigma = 1.23
         momentum = 0.9
         delta = 10 ** (-5)
         max_norm = 0.1
         max_terms_per_node = 20
         target_delta = 1e-5
+        noise_multiplier = sigma * compute_base_sensitivity(max_degree=args.max_node_degree,
+                                                            num_message_passing_steps=args.num_layers)
         optimizer = DPSGD(
             l2_norm_clip=max_norm,  # 裁剪范数
-            noise_multiplier=sigma,
+            noise_multiplier=noise_multiplier,
             minibatch_size=args.batch_size,  # 几个样本梯度进行一次梯度下降
             microbatch_size=1,  # 几个样本梯度进行一次裁剪，这里选择逐样本裁剪
             params=model.parameters(),

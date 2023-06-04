@@ -4,6 +4,25 @@ import scipy.stats
 import numpy as np
 
 
+def compute_base_sensitivity(num_message_passing_steps, max_degree):
+  """Returns the base sensitivity which is multiplied to the clipping threshold.
+
+  Args:
+
+  """
+
+  num_message_passing_steps = num_message_passing_steps
+  max_node_degree = max_degree
+
+  if num_message_passing_steps == 1:
+    return float(2 * (max_node_degree + 1))
+
+  if num_message_passing_steps == 2:
+    return float(2 * (max_node_degree ** 2 + max_node_degree + 1))
+
+  # We only support MLP and upto 2-layer GNNs.
+  raise ValueError('Not supported for num_message_passing_steps > 2.')
+
 def compute_multiterm_rdp(orders, num_training_steps, noise_multiplier, num_samples, max_terms_per_node, batch_size):
     terms_rv = scipy.stats.hypergeom(num_samples, max_terms_per_node, batch_size)
     terms_logprobs = [

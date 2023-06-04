@@ -49,7 +49,7 @@ def sample_adjacency_lists(edges, train_nodes,
     train_nodes = set(train_nodes)
     all_nodes = edges.keys()
 
-    reversed_edges = reverse_edges(edges)
+    reversed_edges = reverse_edges(edges) # 逆邻接表记录每个节点的入边节点
     sampled_reversed_edges = {u: [] for u in all_nodes}
 
     # For every node, bound the number of incoming edges from training nodes.
@@ -58,7 +58,7 @@ def sample_adjacency_lists(edges, train_nodes,
         # u_rng = jax.random.fold_in(rng, u)
         incoming_edges = reversed_edges[u]
         incoming_train_edges = [v for v in incoming_edges if v in train_nodes]
-        if not incoming_train_edges:
+        if not incoming_train_edges: # 只处理入边中训练集中的节点
             continue
 
         in_degree = len(incoming_train_edges)
@@ -111,8 +111,8 @@ def subsample_graph(graph: Data, max_degree):
 
 def subsample_graph_ogb(graph: torch.Tensor, max_degree):
     edges = get_adjacency_lists_ogb(graph)
-    tmp = [len(l) for l in edges.values()]
-    max_degree = np.max([len(l) for l in edges.values()])
+    # tmp = [len(l) for l in edges.values()]
+    # max_degree = np.max([len(l) for l in edges.values()])
     train_indices = graph.unique().tolist()
     edges = sample_adjacency_lists(edges, train_indices, max_degree)
     senders = []
