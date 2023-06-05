@@ -479,16 +479,16 @@ parser.add_argument('--runs', type=int, default=1)
 parser.add_argument('--train_percent', type=float, default=1)
 parser.add_argument('--val_percent', type=float, default=1)
 parser.add_argument('--test_percent', type=float, default=1)
-# parser.add_argument('--dynamic_train', action='store_true',
+parser.add_argument('--dynamic_train', action='store_true',
+                    help="dynamically extract enclosing subgraphs on the fly")
+# parser.add_argument('--dynamic_train', default=True,
 #                     help="dynamically extract enclosing subgraphs on the fly")
-parser.add_argument('--dynamic_train', default=True,
-                    help="dynamically extract enclosing subgraphs on the fly")
-# parser.add_argument('--dynamic_val', action='store_true')
-parser.add_argument('--dynamic_val', default=True,
-                    help="dynamically extract enclosing subgraphs on the fly")
-# parser.add_argument('--dynamic_test', action='store_true')
-parser.add_argument('--dynamic_test', default=True,
-                    help="dynamically extract enclosing subgraphs on the fly")
+parser.add_argument('--dynamic_val', action='store_true')
+# parser.add_argument('--dynamic_val', default=True,
+#                     help="dynamically extract enclosing subgraphs on the fly")
+parser.add_argument('--dynamic_test', action='store_true')
+# parser.add_argument('--dynamic_test', default=True,
+#                     help="dynamically extract enclosing subgraphs on the fly")
 parser.add_argument('--num_workers', type=int, default=16,
                     help="number of workers for dynamic mode; 0 if not dynamic")
 parser.add_argument('--train_node_embedding', action='store_true',
