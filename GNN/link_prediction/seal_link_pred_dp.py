@@ -5,6 +5,7 @@
 import argparse
 import time
 import os, sys
+sys.path.append("../../")
 import os.path as osp
 from shutil import copy
 import copy as cp
@@ -455,7 +456,7 @@ parser.add_argument('--model', type=str, default='GCN')
 parser.add_argument('--sortpool_k', type=float, default=0.6)
 parser.add_argument('--num_layers', type=int, default=3)
 parser.add_argument('--hidden_channels', type=int, default=32)
-parser.add_argument('--batch_size', type=int, default=512)
+parser.add_argument('--batch_size', type=int, default=2048)
 # Subgraph extraction settings
 parser.add_argument('--num_hops', type=int, default=3)
 parser.add_argument('--ratio_per_hop', type=float, default=1.0)
