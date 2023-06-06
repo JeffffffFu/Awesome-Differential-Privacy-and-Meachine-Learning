@@ -21,7 +21,7 @@ def get_adjacency_lists(dataset: Data):
     return edges
 
 
-def get_adjacency_lists_ogb(graph: torch.Tensor):
+def get_adjacency_lists_from_tensor(graph: torch.Tensor):
     ids = graph.unique().tolist()
     edges = {u: [] for u in ids}
     for u, v in graph.T.tolist():
@@ -49,16 +49,17 @@ def sample_adjacency_lists(edges, train_nodes,
     train_nodes = set(train_nodes)
     all_nodes = edges.keys()
 
-    reversed_edges = reverse_edges(edges)
+    reversed_edges = reverse_edges(edges)  # 逆邻接表记录每个节点的入边节点
     sampled_reversed_edges = {u: [] for u in all_nodes}
 
     # For every node, bound the number of incoming edges from training nodes.
     dropped_count = 0
+    dropped_users = []
     for u in all_nodes:
         # u_rng = jax.random.fold_in(rng, u)
         incoming_edges = reversed_edges[u]
         incoming_train_edges = [v for v in incoming_edges if v in train_nodes]
-        if not incoming_train_edges:
+        if not incoming_train_edges:  # 只处理入边中训练集中的节点
             continue
 
         in_degree = len(incoming_train_edges)
@@ -77,8 +78,10 @@ def sample_adjacency_lists(edges, train_nodes,
             sampled_reversed_edges[u] = unique_incoming_train_edges.tolist()
         else:
             dropped_count += 1
+            dropped_users.append(u)
 
     print('dropped count', dropped_count)
+    print("dropped nodes", dropped_users)
     sampled_edges = reverse_edges(sampled_reversed_edges)
 
     # For non-train nodes, we can sample the entire edgelist.
@@ -88,46 +91,37 @@ def sample_adjacency_lists(edges, train_nodes,
     return sampled_edges
 
 
-def get_train_indices(graph: Data):
-    indices = torch.where(graph.train_mask)[0].tolist()
-    return indices
-
-
-def subsample_graph(graph: Data, max_degree):
-    edges = get_adjacency_lists(graph)
-    train_indices = get_train_indices(graph)
+def subsample_graph(graph: [Data, torch.Tensor], max_degree):
+    if isinstance(graph, Data):
+        edges = get_adjacency_lists(graph)
+        if hasattr(graph, "train_mask"):
+            train_indices = torch.where(graph.train_mask)[0].tolist()
+        else:
+            train_indices = graph.edge_index.unique().tolist()
+    elif isinstance(graph, torch.Tensor):
+        edges = get_adjacency_lists_from_tensor(graph)
+        train_indices = graph.unique().tolist()
+    else:
+        raise ValueError("Invalid graph type, must be pyg Data or Tensor")
     edges = sample_adjacency_lists(edges, train_indices, max_degree)
-
     senders = []
     receivers = []
     for u in edges:
         for v in edges[u]:
-            senders.append(u)
+            senders.append(u)  # 空值的键会被省略
             receivers.append(v)
     edge_index = torch.tensor([senders, receivers])
     graph.edge_index = edge_index
     return graph
 
 
-def subsample_graph_ogb(graph: torch.Tensor, max_degree):
-    edges = get_adjacency_lists_ogb(graph)
-    tmp = [len(l) for l in edges.values()]
-    max_degree = np.max([len(l) for l in edges.values()])
-    train_indices = graph.unique().tolist()
-    edges = sample_adjacency_lists(edges, train_indices, max_degree)
-    senders = []
-    receivers = []
-    for u in edges:
-        for v in edges[u]:
-            senders.append(u)
-            receivers.append(v)
-    edge_index = torch.tensor([senders, receivers])
-    graph = edge_index
-    return graph
+def filter_out_one_way_edges(edge_index: torch.Tensor):
+    edge_index_list = edge_index.T.tolist()
+    filtered_edges = [edge for edge in edge_index_list if edge[::-1] in edge_index_list]
+    return torch.tensor(filtered_edges).T
 
 
 def subsample_graph_for_undirected_graph(graph, max_degree):
-    graph = subsample_graph_ogb(graph, max_degree)
-    graph = graph[[1, 0]]
-    graph = subsample_graph_ogb(graph, max_degree)
+    graph = subsample_graph(graph, max_degree)
+    graph.edge_index = filter_out_one_way_edges(graph.edge_index)
     return graph

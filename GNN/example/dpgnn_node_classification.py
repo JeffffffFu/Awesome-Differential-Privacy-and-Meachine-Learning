@@ -68,7 +68,13 @@ def main(batch_size, k_hop, max_norm, target_delta, max_terms_per_node, max_degr
     data = dataset[0]
     from GNN.utils import extract_node_subgraphs
     import GNN.sampler as sampler
-    data = sampler.subsample_graph(data, max_degree=max_degree)
+    from torch_geometric.utils import is_undirected, to_undirected
+    from privacy_analysis.RDP.compute_multiterm_rdp import compute_base_sensitivity
+    # data = sampler.subsample_graph(data, max_degree=max_degree)
+    np.random.seed(1234)
+    if is_undirected(data.edge_index):
+        data = sampler.subsample_graph_for_undirected_graph(data, max_degree=max_degree)
+        assert is_undirected(data.edge_index), "The direction of the graph is changed, something wrong!"
     subgraphs = extract_node_subgraphs(data, k_hop, "cora")
     train_subgraphs, val_subgraphs, test_subgraphs = train_val_test_split(subgraphs)
     # train_loader = DataLoader(data, batch_size=batch_size, num_workers=0, shuffle=True)
@@ -76,9 +82,10 @@ def main(batch_size, k_hop, max_norm, target_delta, max_terms_per_node, max_degr
     # train_loader = DataLoader(train_subgraphs, batch_size=batch_size, num_workers=0, shuffle=True)
     # test_loader = DataLoader(test_subgraphs, batch_size=batch_size, num_workers=0, shuffle=True)
     # optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)  # 使用Adam，weight_decay其实就是L2正则化
+    noise_multiplier = sigma * compute_base_sensitivity(max_degree=max_degree, num_message_passing_steps=2)
     optimizer = DPSGD(
         l2_norm_clip=max_norm,  # 裁剪范数
-        noise_multiplier=sigma,
+        noise_multiplier=noise_multiplier,
         minibatch_size=batch_size,  # 几个样本梯度进行一次梯度下降
         microbatch_size=1,  # 几个样本梯度进行一次裁剪，这里选择逐样本裁剪
         params=model.parameters(),
@@ -121,7 +128,8 @@ if __name__ == "__main__":
     # dataset = TUDataset(root='/tmp/ENZYMES', name='ENZYMES', use_node_attr=True)
     learning_rate = 0.5
     numEpoch = 15000
-    sigma = 1.23
+    # sigma = 1.23
+    sigma = 0.01
     momentum = 0.9
     delta = 10 ** (-5)
     max_norm = 0.1

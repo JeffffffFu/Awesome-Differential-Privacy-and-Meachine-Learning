@@ -136,7 +136,7 @@ def train_dynamic_add_noise_geo_uniform_batch(model, train_loader, optimizer, cr
             loss = criterion(output, data.y)
             loss.backward()  # 梯度求导，这边求出梯度
             optimizer.microbatch_step()  # 这个step做的是每个样本的梯度裁剪和梯度累加的操作
-            train_loss += loss
+            train_loss += loss.item()
         optimizer.step_dp()  # 这个做的是梯度加噪和梯度平均更新下降的操作
     return train_loss, train_acc  # 返回平均损失和平均准确率
 
