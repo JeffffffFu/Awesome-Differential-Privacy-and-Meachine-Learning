@@ -17,12 +17,13 @@ bilibili（论文分享）:https://space.bilibili.com/80356866/video
       - [ZCDP](#zcdp)
       - [GDP](#gdp)
       - [Bayesian DP](#Bayesian-DP)
-    - [Privacy Amplification Technology](#Privacy Amplification Technology)
+    - [Privacy Amplification Technology](#privacy-amplification-technology)
       - [Sampling](#samlping)
       - [Shuffle](#shuffle)
   - [DP and Meachine Learning](#dp-and-meachine-learning)  
     - [Meachine Leaning](#meachine-learning)
     - [Meachine Leaning with DP](#meachine-learning-with-dp)
+    - [GNN](#gnn)
     - [GNN with DP](#gnn-with-dp)
   - [DP and Federated Leaning](#dp-and-federated-learning)  
     - [Federated Leaning](#federated-leaning) 
@@ -145,11 +146,18 @@ TO DO
 | Local Differential Privacy for Deep Learning                                                    | RMIT University | IEEE Internet of Things/2020                        | 本篇文章给出了在下采样和池化层之后，对数据特征进行扰动，在进行全连接层之前进行扰动。比较核心在于对整个梯度进行编码，利用十进制转二进制，在进行比特的扰动。后文引入的优化方法的参数a存在偷换概念的问题，相当于引入了一个新的隐私预算，但是缺忽视掉了。                                                                                                                           | 
 | Differential Privacy Meets Neural Network Pruning                                                    | Kamil Adamczewski                           | arxiv/2023                                          | 文章将传统按权值剪枝的技术和DPSGD进行结合，确定剪枝的mask是通过公共数据集得到的。进行DPSGD结合有两点好处，一是在进行裁剪的时候，只对参与训练的神经元进行裁剪，也就是减少了裁剪幅度，也相当于double clip。其二加噪声时，只对参与训练的神经元加噪，这样减少了噪声对模型的影响，尤其在大模型下。                                                                                           | 
 
+### GNN 
+| Title                                                                                                                                  | Team/Main Author                      | Venue and Year      | Key Description                                                           
+|:---------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------|:--------------------|:--------------------------------------------------------------------------
+| Federated Graph Machine Learning: A Survey of Concepts, Techniques, and Applications                                                        | University of Virginia                      | KDD/2022            | 图联邦学习综述，对于FL结合graph三种异质情况的分类：1、客户端之间点重合；2、客户端之间边缺失；3、客户端之间数据异质（这个和传统联邦一致） | 
+| Graph Sparsification via Meta-Learning                                                                                                 | Graph Sparsification via Meta-Learning| ICDE(workshop)/2021 | 在节点分类任务中，通过对邻接矩阵求导来进行邻接矩阵的稀疏化，对应边为1的地方，求导梯度值越大，越应该置为0                     | 
+
 ### GNN with DP
-| Title                                                                                           | Team/Main Author | Venue and Year      | Key Description                                                                                            
-|:------------------------------------------------------------------------------------------------|:-----------------|:--------------------|:-----------------------------------------------------------------------------------------------------------
-| GAP: Differentially Private Graph Neural Networks with Aggregation Perturbation                                                         | Sina Sajadmanesh | USENIX/2023         | 在非端到端的图机器学习中，提出边级别和节点级别的图差分隐私。其主要想法是在消息传递，即特征聚合的时候利用CDP的概念进行加噪，在聚合前进行特征归一化从而获得每个节点特征的l2范数的bound，以获得敏感度。    | 
-| Node-Level Differentially Private Graph Neural Networks                                                        | Google           | ICLR(workshop)/2022 | 将DPSGD应用到图的节点分类任务，主要是限制图的最大度，从而利用N叉树的总节点个数去算出每个节点在K跳的情况下影响到多少个节点的gradient，从而确定敏感度。并有一个针对这个场景的新的采样放大的隐私预算推导 | 
+| Title                                                                                                                                  | Team/Main Author                                             | Venue and Year      | Key Description                                                                                            
+|:---------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------|:--------------------|:-----------------------------------------------------------------------------------------------------------
+| GAP: Differentially Private Graph Neural Networks with Aggregation Perturbation                                                        | Sina Sajadmanesh                                             | USENIX/2023         | 在非端到端的图机器学习中，提出边级别和节点级别的图差分隐私。其主要想法是在消息传递，即特征聚合的时候利用CDP的概念进行加噪，在聚合前进行特征归一化从而获得每个节点特征的l2范数的bound，以获得敏感度。    | 
+| Node-Level Differentially Private Graph Neural Networks                                                                                | Google                                                       | ICLR(workshop)/2022 | 将DPSGD应用到图的节点分类任务，主要是限制图的最大度，从而利用N叉树的总节点个数去算出每个节点在K跳的情况下影响到多少个节点的gradient，从而确定敏感度。并有一个针对这个场景的新的采样放大的隐私预算推导 | 
+| SoK: Differential Privacy on Graph-Structured Data                                                                                     | SoK: Differential Privacy on Graph-Structured Data           | Arxiv/2022          | 图结合DP的综述文章                                                                                                 | 
 
 ## DP and Federated Learning
 
