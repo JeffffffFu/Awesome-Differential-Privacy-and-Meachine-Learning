@@ -23,15 +23,6 @@ def centralization_train(train_dataset, test_data, batch_size, model, numEpoch, 
     #optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,momentum=0.9)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    # scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2, verbose=True,
-    #                                                  threshold=0.00005, threshold_mode='rel', cooldown=0, min_lr=0,
-    #                                                  eps=1e-08)
-
-
-
-
-    #按照batch_size去分训练数据
-    #这里默认作MBSGD，如果想改成BSGD，batchsize=总样本数量即可，如果想改成SGD，batchsize=1即可
     train_dl = torch.utils.data.DataLoader(
         train_data, batch_size=batch_size, shuffle=True)
 

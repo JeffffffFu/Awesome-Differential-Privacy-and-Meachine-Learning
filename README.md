@@ -75,6 +75,7 @@ CDP（central DP）有一个完全可信的中心方，敌手是外界。而LDP�
 | Programming Differential Privacy （Book）| Joseph P. Near and Chiké Abuah | 2021 | 讲诉了DP的概念定理和机制等，并附有简单代码呈现（简单入门推荐） | 
 | The Algorithmic Foundations of Differential Privacy（Book） | Cynthia Dwork | 2014 | DP的定义理论，高级组合和相关机制等的完整证明推导（更加理论）[【拉普拉斯、严格差分、高斯机制、松弛差分】](https://www.bilibili.com/video/BV18r4y1j7Bs?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3) |
 | Differential Privacy From Theory to Practice （Book）| Ninghui Li | 2014 | 除了一些基本定理和机制，用了具体的实际例子讲诉了DP的用法及DP的伦理探讨（更加实用化）[【Chapter1、Chapter2】](https://www.bilibili.com/video/BV1br4y1J7Qn?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3),[原作者讲解]()|
+| The Bounded Laplace Mechanism in Differential Privacy| IBM | 2018 | 提出了阈值限定的重加噪拉普拉斯机制无法满足纯DP，但是可以满足松弛DP，文章给出了噪声系数需要满足一个式子(该式子和区间，eps，delta相关)即可满足(eps,delta)-DP。这边的松弛DP不是用的RDP，而是直接在后面加一个delta来放缩sigma。|
 
 #### RDP(MA)
 此前的MA（monments accountant）目前来看就是RDP，区别在于RDP从一开始的散度就用了高阶矩进行度量，而MA是在分布上进行高阶矩度量，不过最后的表达形式几乎一致，两者思想也一致。

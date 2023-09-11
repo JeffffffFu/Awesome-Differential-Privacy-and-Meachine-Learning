@@ -84,10 +84,7 @@ eps, opt_order=apply_dp_sgd_analysis(256/60000, 1.1, 17470, orders, 10**(-5))
 print("eps:",format(eps)+"| order:",format(opt_order))
 '''
 
-#这里是2.7   0.8（3400）  1.0（11000）  1.1（15200）
-#
-#cifar10(EPS=7.53) 只有50000个样本  这边用0.7的sigma不行，训练次数只有8000这样，准确率大概50%。 0.8，20430。后面考虑用0.8的sigma。
-#注意下面的采样率
+
 if __name__=="__main__":
     orders = [1 + x / 10.0 for x in range(1, 100)] + list(range(11, 64))+ [128, 256, 512]
 

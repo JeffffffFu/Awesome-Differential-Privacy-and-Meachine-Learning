@@ -175,18 +175,9 @@ def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_s
     print("------ Training finished ------")
 
 if __name__=="__main__":
-    # python3
-    # cnns.py - -dataset = mnist - -batch_size = 512 - -lr = 0.5 - -noise_multiplier = 1.23
-    # python3
-    # cnns.py - -dataset = fmnist - -batch_size = 2048 - -lr = 4 - -noise_multiplier = 2.15
-    # python3
-    # cnns.py - -dataset = cifar10 - -batch_size = 1024 - -lr = 1 - -noise_multiplier = 1.54
 
-    #train_data, test_data = get_data('cifar10', augment=False)
     train_data, test_data = get_data('mnist', augment=False)
-   #  print(train_data.__dict__)
     model = CNN()
-    #model= resnet20(10, False)  #含有batchNorm层的需要进行模型转换
     batch_size =512
     learning_rate = 0.5
     eps_budget = 5.0
