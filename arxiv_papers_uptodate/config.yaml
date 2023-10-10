@@ -5,7 +5,7 @@ repo_name: "cv-arxiv-daily"
 show_authors: True
 show_links: True
 show_badge: True
-max_results: 10
+max_results: 20
 
 publish_readme: True
 publish_gitpage: True
@@ -23,7 +23,9 @@ md_wechat_path: './docs/wechat.md'
 # keywords to search
 keywords:
     "Differential Privacy":
-      filters: ["DP", "Differential Privacy"]
+      filters: ["DP", "Differential Privacy", "Differentially Private"]
+    "Graph Neural Network":
+      filters : ["GNN", "Graph Neural Network"]
 #    "SLAM":
 #        filters: ["SLAM", "Visual Odometry"]
 #    "SFM":
