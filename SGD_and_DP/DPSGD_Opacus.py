@@ -129,13 +129,7 @@ def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_s
         noise_multiplier=sigma,
         max_grad_norm=max_norm,
     )
-    epoch=1
-    eps_97=0.
-    label1=0
-    eps_98=0.
-    label2=0
-    eps_985=0.
-    label3=0
+    epoch=0
     epsilon_list=[]
     epsilon=0.
     while epsilon < eps_budget:
@@ -147,29 +141,18 @@ def centralization_train_with_dp_by_opacus2(train_data, test_data, model,batch_s
         #下面的计算都是需要一个完整的epoch
         epsilon = privacy_engine.accountant.get_epsilon(delta=delta)
 
-        if central_test_accuracy>97.0 and label1==0:
-            eps_97=epsilon
-            label1=1
-
-        if central_test_accuracy>98.0 and label2==0:
-            eps_98=epsilon
-            label2=1
-
-        if central_test_accuracy>98.5 and label3==0:
-            eps_985=epsilon
-            label3=1
 
         # result_loss_list.append(central_test_loss)
         # result_acc_list.append(central_test_accuracy)
 
         print("privacy_accoutant:",privacy_accoutant+"| epoch: {:3.0f}".format(epoch + 1) + " | epsilon: {:7.4f}".format(
         epsilon)   )
-
-    File_Path_Csv = os.getcwd() + f"/result/csv/DPSGD/MNIST//"
-    if not os.path.exists(File_Path_Csv):
-        os.makedirs(File_Path_Csv)
-    pd.DataFrame([eps_97, eps_98, eps_985]).to_csv(
-        f"{File_Path_Csv}.csv", index=False, header=False)
+    #
+    # File_Path_Csv = os.getcwd() + f"/result/csv/DPSGD/MNIST//"
+    # if not os.path.exists(File_Path_Csv):
+    #     os.makedirs(File_Path_Csv)
+    # pd.DataFrame([eps_97, eps_98, eps_985]).to_csv(
+    #     f"{File_Path_Csv}.csv", index=False, header=False)
 
 
     print("------ Training finished ------")

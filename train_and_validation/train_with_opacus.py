@@ -81,7 +81,9 @@ def train_privacy_opacus2(model, train_loader, optimizer):
             output = model(data.to(torch.float32))  # 这要是这里要做升维
 
             loss = F.cross_entropy(output, target)  # 定义损失
+
             loss.backward()  # 梯度求导
+
             optimizer.step()  # 参数优化更新
             train_loss += loss.item()  # 损失累加
             prediction = output.argmax(dim=1, keepdim=True)  # 将one-hot输出转为单个标量

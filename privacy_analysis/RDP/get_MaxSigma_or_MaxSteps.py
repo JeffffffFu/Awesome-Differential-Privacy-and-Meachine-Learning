@@ -111,15 +111,16 @@ def get_steps_without_has_runned(
     return int(steps_high)-steps_has_runned
 
 if __name__=="__main__":
-    sample_rate=512/60000
+    sample_rate=1024/60000
     steps=10000
-    eps=3.0
+    eps=4.0
     alphas = [1 + x / 10.0 for x in range(1, 100)] + list(range(11, 64))+ [128, 256, 512]
     delta=1e-5
-    sigma=1.23
+    sigma=1.35
     # Max_step=batch_steps_allowed(sample_rate, steps_has_runned,steps_allowed_next, maxEps, delta,sigma, alphas)
     # print("Max_step:",Max_step)
     #noise_multiplier=get_noise_multiplier(eps,delta,sample_rate,steps,alphas)
     max_steps=get_steps(eps,delta,sample_rate,sigma,alphas)
 
     print("max_steps:",max_steps)
+    print("epochs:",max_steps*sample_rate)

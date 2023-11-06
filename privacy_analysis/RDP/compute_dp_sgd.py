@@ -87,6 +87,5 @@ print("eps:",format(eps)+"| order:",format(opt_order))
 
 if __name__=="__main__":
     orders = [1 + x / 10.0 for x in range(1, 100)] + list(range(11, 64))+ [128, 256, 512]
-
-    eps, opt_order = apply_dp_sgd_analysis(512 / 60000, 0.01, 1, orders, 10 ** (-5))
+    eps, opt_order = apply_dp_sgd_analysis(0.05, 2.0, 1000, orders, 10 ** (-5))
     print("eps:", format(eps) + "| order:", format(opt_order))

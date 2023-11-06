@@ -25,7 +25,6 @@ def train_dynamic_add_noise(model, train_loader, optimizer):
 
     return train_loss, train_acc  # 返回平均损失和平均准确率
 
-
 def train_dynamic_add_noise_split_vector(model, train_loader, optimizer):
     model.train()
     train_loss = 0.0
