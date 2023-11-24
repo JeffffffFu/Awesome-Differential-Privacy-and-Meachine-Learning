@@ -34,12 +34,15 @@ bilibili（论文分享）:https://space.bilibili.com/80356866/video
     - [vertical FL with DP](#vertical-fl-with-dp)
     - [incentive](#incentive)
   - [Attack](#attack)
+    - [MIA](#membership-inference-attack)
   - [Application Scenarios](#application-scenarios)
     - [Text Protection](#text-protection)
     - [Recommended System](#recommended-system)
     - [DP and image](#dp-and-image)
     - [DP and cypto](#dp-and-cytro)
-
+  - [Meachine Unlearning](#meachine-unlearning)
+    - [Unlearning in Centralized machine learning](#unlearning-in-centralized-machine-learning)
+    - [Unlearning in FL](#unlearning-in-fl)
 
 ## DP Theory
 
@@ -208,7 +211,8 @@ TO DO
 | Adap DP-FL: Differentially Private Federated Learning with Adaptive Noise  | Jie Fu | Trustcom/2022 | 主要是两个自适应点，一个是不同客户端不同轮的自适应裁剪范数，一个是不同轮的自适应噪声系数衰减。                                                                                                                                                                                                        | 
 | DPAUC: Differentially Private AUC Computation in Federated Learning  | Jiankai Sun | 2022 | 作者举了一个联邦下客户端模型根据本地测试集进行性能评测算出AUC给中心方的场景，该场景认为AUC（ROC curve）会泄露客户端本地测试集隐私信息，故在传给中心方相关FP和FN等数值上加拉普拉斯噪声进行隐私保护。                                                                                                                                            | 
 #### LDP-FL
-上面的会把模型看成一个整体，敏感度的计算是模型参数的L2范数作为指标衡量。LDP的联邦下，模型参数的每一个神经元权值看成一个LDP要保护的维度，每个神经元是串行的隐私关系。裁剪是针对每个单独神经元进行裁剪。
+上面的会把模型或者模型之差看成一个整体，将其看成一个高维数据。
+敏感度的计算一般是逐个元素单独裁剪，后面进行隐私预算累加。但是也可以将整个模型或者模型之差看成一个整体进行二范数的裁剪。
 或者没有客户端中心方做小批量梯度下降，一般这种场景一个客户端只有一个样本数据，如果有多个样本数据会训练多个梯度上传给联邦中心方
 
 | Title | Team/Main Author            | Venue and Year                                     | Key Description                                                                                                                                                                                                                                                                               
@@ -219,7 +223,7 @@ TO DO
 | Shuffle Gaussian Mechanism for Differential Privacy | Seng Pei Liew               | 2022                                               | 本地客户端进行高斯加噪后得到一个梯度，然后对不同客户端的梯度进行shuffle进行隐私放大。并用不放回随机采样和泊松采样的高斯机制结合shuffle进行理论证明（基于RDP）。                                                                                                                                                                                                      
 | The Privacy Blanket of the Shuffle Model | Borja Balle                 | 2019                                               | 最为经典的shuffle证明。首先指出，对于shuffle模型，整个shuffle中的数据集应当看成整体，从而才有相邻数据集，针对这个数据集整体满足差分隐私。其次，采用数据相关和数据无关将整体数据分割成两部分，最大化敌手，使得最后只需要分析数据无关的部分，即隐私毯子，随机性在隐私毯子中。[【vedio】](https://www.bilibili.com/video/BV14W4y1b7VK?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3) 
 | Hiding Among the Clones: A Simple and Nearly Optimal Analysis of Privacy Amplification by Shuffling | Vitaly Feldman              | 2020                                               | 和隐私毯子类似的证明思想，不过假设的敌手知道的背景知识没有隐私毯子那么全面，每一个扰动的输出都会影响隐私性。在数据相关部分，进一步分成p/2和p/2进行分析。得到的隐私界比隐私毯子更紧凑。                                                                                                                                                                                                
-| Differentially Private Federated Learning with Local Regularization and Sparsification | Chinese Academy of Sciences | 2021                                               | 提出了正则化和稀疏化                                                                                                                                                                                        
+| Differentially Private Federated Learning with Local Regularization and Sparsification | Chinese Academy of Sciences | 2021                                               | 本地对模型之差进行裁剪加噪，并提出了对应的正则化和稀疏化方法                                                                                                                                                                                        
 | Make Landscape Flatter in Differentially Private Federated Learning | TsingHua                    | 2021                                               | 提出的算法集成了Sharpness Aware Minimization（SAM）优化器，以生成具有更好稳定性和权重扰动鲁棒性的局部平面度模型，这导致局部更新的范数较小                                                                                                                                                                                             
 
 #### Incentive
@@ -246,6 +250,11 @@ TO DO
 | Evaluating Differentially Private Machine Learning in Practice       | openmind            | CCS /2019                                       | 对不同的DP（高级组合，ZCDP，RDP等）进行评估，用黑盒和白盒的成员推理攻击来评估经过这些DP训练后的模型的防御效果。                                                                                                                |                                                                                              
 | FLAME: Taming Backdoors in Federated Learning       | Technical University of Darmstadt            | USENIX /2022                                    | 在差分隐私结合联邦场景中提出了FLAME， 使用模型聚类（基础假设为后门训练的权重和良性权重存在较大的方向偏差）和权重裁剪（采用中位数进行裁剪，基础假设是后门敌手不会超过总客户端的一半）方法。这确保了 FLAME 可以在有效消除对抗性后门的同时保持聚合模型的良性性能。实验表明加很少的噪声就可以非常有效的抵御后门攻击，应该是裁剪对后门的作用大。 |                                                                                              
 
+### Membership Inference Attack
+| Gradient-Leaks: Enabling Black-box Membership Inference Attacks against Machine Learning Models       | HUST            | TIFS /2023                                    | 因为每条数据都会对梯度更新产生影响，利用每个数据独有的梯度，用自编码器得出梯度背后的隶属度信息（瓶颈为隶属度相关的几个特征），无监督学习；利用构造局部模型的方式求某条data的梯度（类似可解释性AI中的LIME方法） |                                                                                              
+| TEAR: Exploring Temporal Evolution of Adversarial Robustness for Membership Inference Attacks Against Federated Learning       | HUST            | TIFS /2023                                    | 每个client能访问本地的全部训练信息，并在每一轮全局下发的时候得到全模型预测接口，可进行label only的预测；攻击方client用自身数据的对抗鲁棒性作为特征，训练二分类模型进行对其他client的MIA（本文假设各个client数据异质性不强）。攻击时利用对抗鲁棒性随时间变化（收敛趋势）的特性得出隶属信息；利用fL决策边界会逐渐拟合训练集而非测试集；决策边界和训练数据的额距离越大，越不易受对抗性扰动，将此距离作为对抗鲁棒性的度量，训练过程中持续收集该性质，作为隶属度特征。 |                                                                                              
+| Membership Inference via Backdooring       | Auckland            | IJCAI /2022                                    | 这个场景是数据拥有者判断自己的敏感数据集有没有用于某个模型训练，对自己数据集的少部分进行标记（trigger），利用这部分数据进行隶属推断，模型将学到trigger和目标标签的相关性。利用成员推理来判断自己标记的数据集在不在训练数据集中 |                                                                                              
+
 ## Application Scenarios
 
 ### Text Protection
@@ -269,4 +278,14 @@ TO DO
 | :------------| :------ | :---------- | :----------------------- 
 | Efficient Differentially Private Secure Aggregation for Federated Learning via Hardness of Learning with Errors | University of Vermont | CCS/2021 | 该文章在原来的用同态加密进行联邦聚合的基础上，刻画了噪声的DP衡量，因为之前用的LWE天然存在噪声，所以该文章把这个噪声用DP量化出来。同时，也可以理解成其用同态加密的方法将原来的LDP加噪变成CDP的加噪方式，类似shuffle的理念。[【vedio】](https://www.bilibili.com/video/BV1fR4y1D7dU/?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
 | Private, Efficient, and Accurate: Protecting Models Trained by Multi-party Learning with Differential Privacy | Fudan University | SP/2022 | 核心在于利用了多方安全的秘密分享构建出一个虚拟的联邦中心方，使的不同客户端的样本数据可以进行秘密分享后“集中”式训练，然后在再训练的梯度上加DP，以此满足模型的差分隐私。相较于之前的模型，该模型不用LDP,也不用shuffle，将所以客户端数据整合成集中式变成CDP的形式（这样可以用更小的eps，即不造成更大的精度损失），并且没有可信第三方。| 
+
+## Meachine unlearning
+## Unlearning in Centralized machine learning 
+| When Machine Unlearning Jeopardizes Privacy | CMU | CCS/2021 | 提出unlearn会造成隐私泄露，可以根据unlearn前后单目标的后验概率的差异判断数据是否被删；两种聚合unlearn前后的后验概率的方案，作为攻击模型的输入，concatenating（在过拟合模型攻击效果好）/求差（在泛化性能好的模型攻击效果好）。2个指标衡量损失了多少隐私（目标样本置信度高于经典MIA的比例&置信度增量的平均值）并提出4个防御方案| 
+
+## Unlearning in FL
+| FedEraser: Enabling Efficient Client-Level Data Removal from Federated Learning Models | HUST | IWQOS/2022 | 牺牲中心方的内存，每隔几轮存储各个client的更新增量；指出client的更新指示全局模型变化的方向；利用少量的矫正训练的到的更新指示方向，用保存的更新提供幅度，得出unlearn后的更新（旧update的幅值+矫正训练update的方向）；用类似相位的方法评价unlearn后的模型与retrain的模型的相似度| 
+| Federated Unlearning: How to Efficiently Erase a Client in FL?  | IBM | Arxiv/2022 | client自行完成unlearn，无需中心方全局访问数据，无需存储历史记录；client对自身训练过程有较大权限。请求遗忘的client自行用下发的全局模型，和前一时刻自身局部模型，算出其他client的平均（近似）作为参考模型；做用PGD梯度上升（PGD），约束为和参考模型的距离不能太大| 
+| Federated Unlearning via Class-Discriminative Pruning  | PolyU | WWW/2022 | 专注图像分类任务，忘记一类标签数据，每个client都需上传通道和类别之间的关联度，中心方聚合后，用TF-IDF指标评估相关性，剪枝，下发，微调恢复精度。client上传的关联度类似可解释性AI中的可视化方法；TF- IDF时NLP中衡量word与一堆文档中某个文档的关联性的指标；本文算法不需明确具体需要删除的data，删的是一类label| 
+
 # Code
