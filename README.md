@@ -25,6 +25,7 @@ bilibili（论文分享）:https://space.bilibili.com/80356866/video
     - [Meachine Leaning with DP](#meachine-learning-with-dp)
     - [GNN](#gnn)
     - [GNN with DP](#gnn-with-dp)
+    - [Privacy of GNN](#privacy-of-gnn)
   - [DP and Federated Leaning](#dp-and-federated-learning)  
     - [Federated Leaning](#federated-leaning) 
     - [Horizontal FL with DP](#horizontal-fl-with-dp)
@@ -163,6 +164,14 @@ TO DO
 | GAP: Differentially Private Graph Neural Networks with Aggregation Perturbation                                                        | Sina Sajadmanesh                                             | USENIX/2023         | 在非端到端的图机器学习中，提出边级别和节点级别的图差分隐私。其主要想法是在消息传递，即特征聚合的时候利用CDP的概念进行加噪，在聚合前进行特征归一化从而获得每个节点特征的l2范数的bound，以获得敏感度。    | 
 | Node-Level Differentially Private Graph Neural Networks                                                                                | Google                                                       | ICLR(workshop)/2022 | 将DPSGD应用到图的节点分类任务，主要是限制图的最大度，从而利用N叉树的总节点个数去算出每个节点在K跳的情况下影响到多少个节点的gradient，从而确定敏感度。并有一个针对这个场景的新的采样放大的隐私预算推导 | 
 | SoK: Differential Privacy on Graph-Structured Data                                                                                     | SoK: Differential Privacy on Graph-Structured Data           | Arxiv/2022          | 图结合DP的综述文章                                                                                                 | 
+
+
+### Privacy of GNN
+| Title                                                                           | Team/Main Author | Venue and Year | Key Description                                                                                                                                                                                                                                                                         
+|:--------------------------------------------------------------------------------|:-----------------|:---------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Disparate Vulnerability in Link Inference Attacks against Graph Neural Networks | Stevens          | PETS/2023      | 提出了图中组（针对标签）密度不均匀会加大敏感边的泄露的问题。假设有A，B两种节点标签，这里就存在三组边的联系，A和A，A和B，B和B。A-A组的密度定义为实际这个图中A-A连接的边数除以全部A-A有可能的边数。文章的idea是在训练GNN的过程中，通过扰动（加边或删边）的方式让各组的密度差异不大，进而保护边隐私。                                                                                                                           | 
+| linkteller: recovering private edges from graph neural networks via influence analysis                                                                      | UIUC             | S&P/2022       | 构建了一个纵向图联邦的场景，一方持有特征和标签（public），一方持有边(private)。提出了一种攻击方式，每次改变一个节点的特征观察GNN的输出，去判断节点之间连接关系，本质是一种差分攻击。文章后面提出了用DP进行保护，分别是lap和RR。| 
+
 
 ## DP and Federated Learning
 
