@@ -72,7 +72,6 @@ CDP（central DP）有一个完全可信的中心方，敌手是外界。而LDP�
 ### Privacy Measurement Method
 
 #### DP
-其中分为严格的差分隐私和松弛的差分隐私，DP隐私损失度量可以查阅上面的CDP相关文献。
 | Title | Team/Main Author | Venue and Year | Key Description 
 | :------------| :------ | :---------- | :----------------------- 
 | Differential privacy | Cynthia Dwork | ICALP/2006 | 首次提出差分隐私的定义 | 
@@ -171,6 +170,7 @@ TO DO
 |:--------------------------------------------------------------------------------|:-----------------|:---------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Disparate Vulnerability in Link Inference Attacks against Graph Neural Networks | Stevens          | PETS/2023      | 提出了图中组（针对标签）密度不均匀会加大敏感边的泄露的问题。假设有A，B两种节点标签，这里就存在三组边的联系，A和A，A和B，B和B。A-A组的密度定义为实际这个图中A-A连接的边数除以全部A-A有可能的边数。文章的idea是在训练GNN的过程中，通过扰动（加边或删边）的方式让各组的密度差异不大，进而保护边隐私。                                                                                                                           | 
 | linkteller: recovering private edges from graph neural networks via influence analysis                                                                      | UIUC             | S&P/2022       | 构建了一个纵向图联邦的场景，一方持有特征和标签（public），一方持有边(private)。提出了一种攻击方式，每次改变一个节点的特征观察GNN的输出，去判断节点之间连接关系，本质是一种差分攻击。文章后面提出了用DP进行保护，分别是lap和RR。| 
+| Group property inference attacks against graph neural networks                                                                      | Stevens             | CCS/2022       | 提出了节点的组标签攻击。比如一个图中有两种标签：男和女。通过攻击揭露这两种标签在图中的占比。| 
 
 
 ## DP and Federated Learning
