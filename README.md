@@ -264,6 +264,12 @@ TO DO
 | TEAR: Exploring Temporal Evolution of Adversarial Robustness for Membership Inference Attacks Against Federated Learning       | HUST            | TIFS /2023                                    | 每个client能访问本地的全部训练信息，并在每一轮全局下发的时候得到全模型预测接口，可进行label only的预测；攻击方client用自身数据的对抗鲁棒性作为特征，训练二分类模型进行对其他client的MIA（本文假设各个client数据异质性不强）。攻击时利用对抗鲁棒性随时间变化（收敛趋势）的特性得出隶属信息；利用fL决策边界会逐渐拟合训练集而非测试集；决策边界和训练数据的额距离越大，越不易受对抗性扰动，将此距离作为对抗鲁棒性的度量，训练过程中持续收集该性质，作为隶属度特征。 |                                                                                              
 | Membership Inference via Backdooring       | Auckland            | IJCAI /2022                                    | 这个场景是数据拥有者判断自己的敏感数据集有没有用于某个模型训练，对自己数据集的少部分进行标记（trigger），利用这部分数据进行隶属推断，模型将学到trigger和目标标签的相关性。利用成员推理来判断自己标记的数据集在不在训练数据集中 |                                                                                              
 
+
+### copyright protection
+一般使用后门植入进行版权保护 
+
+| Radioactive Data: Tracing Through Training       | Facebook            | PMLR /2020                                    | 对于数据集版权保护问题，通过在样本中引入不可察觉的变化（放射性），来跟踪特定的数据是否被用于训练模型，根据模型输出判断被保护的数据是否被用于该模型的训练。在数据的潜在空间中添加标记（一个方向向量），使用标记将特征移向某个方向，再把标记从特征空间反向传回像素；这些标记在整个训练过程中保持可检测，最后算分类层权重和这个标记向量的余弦相似度，通过统计检验p-value来验证是否使用了标记数据 |                                                                                              
+
 ## Application Scenarios
 
 ### Text Protection
@@ -288,6 +294,13 @@ TO DO
 | Efficient Differentially Private Secure Aggregation for Federated Learning via Hardness of Learning with Errors | University of Vermont | CCS/2021 | 该文章在原来的用同态加密进行联邦聚合的基础上，刻画了噪声的DP衡量，因为之前用的LWE天然存在噪声，所以该文章把这个噪声用DP量化出来。同时，也可以理解成其用同态加密的方法将原来的LDP加噪变成CDP的加噪方式，类似shuffle的理念。[【vedio】](https://www.bilibili.com/video/BV1fR4y1D7dU/?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
 | Private, Efficient, and Accurate: Protecting Models Trained by Multi-party Learning with Differential Privacy | Fudan University | SP/2022 | 核心在于利用了多方安全的秘密分享构建出一个虚拟的联邦中心方，使的不同客户端的样本数据可以进行秘密分享后“集中”式训练，然后在再训练的梯度上加DP，以此满足模型的差分隐私。相较于之前的模型，该模型不用LDP,也不用shuffle，将所以客户端数据整合成集中式变成CDP的形式（这样可以用更小的eps，即不造成更大的精度损失），并且没有可信第三方。| 
 
+
+### DP and auditing
+| Title | Team/Main Author | Venue and Year | Key Description 
+| :------------| :------ | :---------- | :----------------------- 
+| Privacy Auditing with One (1) Training Run | Thomas Steinke | arxiv/2023 | 该文章提出的DP隐私审计更像是一种攻击，通过在训练集中随机插入数据，然后再对宣传满足DP的算法进行训练，通过观测输出来判断出入的数据有没有在训练数据集中，然后得到对应的eps。一般来说，文章认为当前的DPSGD算法的理论隐私下界太高，这篇文章通过经验实验给的隐私上界一般更紧。| 
+
+
 ## Meachine unlearning
 ## Unlearning in Centralized machine learning 
 | When Machine Unlearning Jeopardizes Privacy | CMU | CCS/2021 | 提出unlearn会造成隐私泄露，可以根据unlearn前后单目标的后验概率的差异判断数据是否被删；两种聚合unlearn前后的后验概率的方案，作为攻击模型的输入，concatenating（在过拟合模型攻击效果好）/求差（在泛化性能好的模型攻击效果好）。2个指标衡量损失了多少隐私（目标样本置信度高于经典MIA的比例&置信度增量的平均值）并提出4个防御方案| 
@@ -296,5 +309,6 @@ TO DO
 | FedEraser: Enabling Efficient Client-Level Data Removal from Federated Learning Models | HUST | IWQOS/2022 | 牺牲中心方的内存，每隔几轮存储各个client的更新增量；指出client的更新指示全局模型变化的方向；利用少量的矫正训练的到的更新指示方向，用保存的更新提供幅度，得出unlearn后的更新（旧update的幅值+矫正训练update的方向）；用类似相位的方法评价unlearn后的模型与retrain的模型的相似度| 
 | Federated Unlearning: How to Efficiently Erase a Client in FL?  | IBM | Arxiv/2022 | client自行完成unlearn，无需中心方全局访问数据，无需存储历史记录；client对自身训练过程有较大权限。请求遗忘的client自行用下发的全局模型，和前一时刻自身局部模型，算出其他client的平均（近似）作为参考模型；做用PGD梯度上升（PGD），约束为和参考模型的距离不能太大| 
 | Federated Unlearning via Class-Discriminative Pruning  | PolyU | WWW/2022 | 专注图像分类任务，忘记一类标签数据，每个client都需上传通道和类别之间的关联度，中心方聚合后，用TF-IDF指标评估相关性，剪枝，下发，微调恢复精度。client上传的关联度类似可解释性AI中的可视化方法；TF- IDF时NLP中衡量word与一堆文档中某个文档的关联性的指标；本文算法不需明确具体需要删除的data，删的是一类label| 
+| FedRecovery: Differentially Private Machine Unlearning for Federated Learning Frameworks  | UTS | TIFS/2023 | 引入梯度残差的概念来量化增量效应，全局模型中删除梯度残差的加权和来消除某个客户端的影响，并添加特定的高斯噪声，使得unlearn模型和retrain模型在统计上不可区分。梯度残差通过计算前一时间点的模型与当前模型的梯度差得到。| 
 
 # Code
