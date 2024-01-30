@@ -207,7 +207,8 @@ TO DO
 | Learning differentially private recurrent language models | H. B. McMahan |  Learning/2017 |首次提出了DP-FedAvg和DP-FedSGD，采样是对客户端进行采样，加噪在中心方。敏感度的计算基于采样率，每个client的联邦权重得到。[【vedio】](https://www.bilibili.com/video/BV1fd4y1A7LD?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
 |Differentially private federated learning: A client level perspective| R. C. Geyer | Cryptography and Security/2017 | 和DP-FedAvg的区别在于客户端上传的模型在中心方进行裁剪，这样就可以进行自适应的裁剪操作（比如取各个客户端模型的范数中值作为裁剪范数）| 
 | Federated Learning with Differential Privacy: Algorithms and Performance Analysis | Nanjing University of Science and Technology | IEEE Transactions on Information Forensics and Security/2019 | 先进行上行链路的隐私保护，然后再基于上行链路的加噪再对下行链路进行加噪，给出了收敛性分析。本篇论文虽然在本地模型加噪，但是敏感度的选择是基于客户端数量，属于client-level| 
-
+| Differentially Private Federated Learning with Local Regularization and Sparsification | Chinese Academy of Sciences | 2021                                               | 本地对模型之差进行裁剪加噪，并提出了对应的正则化和稀疏化方法                                                                                                                                                                                        
+| Make Landscape Flatter in Differentially Private Federated Learning | TsingHua                    | 2021                                               | 提出的算法集成了Sharpness Aware Minimization（SAM）优化器，以生成具有更好稳定性和权重扰动鲁棒性的局部平面度模型，这导致局部更新的范数较小                                                  
 #### sample-Level
 保护客户端下样本的参与信息，每个客户端下的样本看成一个数据，将联邦中心方看成敌手
 
@@ -232,8 +233,7 @@ TO DO
 | Shuffle Gaussian Mechanism for Differential Privacy | Seng Pei Liew               | 2022                                               | 本地客户端进行高斯加噪后得到一个梯度，然后对不同客户端的梯度进行shuffle进行隐私放大。并用不放回随机采样和泊松采样的高斯机制结合shuffle进行理论证明（基于RDP）。                                                                                                                                                                                                      
 | The Privacy Blanket of the Shuffle Model | Borja Balle                 | 2019                                               | 最为经典的shuffle证明。首先指出，对于shuffle模型，整个shuffle中的数据集应当看成整体，从而才有相邻数据集，针对这个数据集整体满足差分隐私。其次，采用数据相关和数据无关将整体数据分割成两部分，最大化敌手，使得最后只需要分析数据无关的部分，即隐私毯子，随机性在隐私毯子中。[【vedio】](https://www.bilibili.com/video/BV14W4y1b7VK?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3) 
 | Hiding Among the Clones: A Simple and Nearly Optimal Analysis of Privacy Amplification by Shuffling | Vitaly Feldman              | 2020                                               | 和隐私毯子类似的证明思想，不过假设的敌手知道的背景知识没有隐私毯子那么全面，每一个扰动的输出都会影响隐私性。在数据相关部分，进一步分成p/2和p/2进行分析。得到的隐私界比隐私毯子更紧凑。                                                                                                                                                                                                
-| Differentially Private Federated Learning with Local Regularization and Sparsification | Chinese Academy of Sciences | 2021                                               | 本地对模型之差进行裁剪加噪，并提出了对应的正则化和稀疏化方法                                                                                                                                                                                        
-| Make Landscape Flatter in Differentially Private Federated Learning | TsingHua                    | 2021                                               | 提出的算法集成了Sharpness Aware Minimization（SAM）优化器，以生成具有更好稳定性和权重扰动鲁棒性的局部平面度模型，这导致局部更新的范数较小                                                                                                                                                                                             
+                                                                                                                                           
 
 #### Incentive
 | Title | Team/Main Author | Venue and Year | Key Description 
