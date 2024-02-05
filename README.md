@@ -53,7 +53,7 @@ CDP（central DP）有一个完全可信的中心方，敌手是外界。而LDP�
 | Title | Team/Main Author | Venue and Year | Key Description 
 | :------------| :------ | :---------- | :----------------------- 
 | Differential privacy | Cynthia Dwork | ICALP/2006 | 首次提出差分隐私的定义 | 
-| Programming Differential Privacy （Book）| Joseph P. Near and Chiké Abuah | 2021 | 讲诉了DP的概念定理和机制等，并附有简单代码呈现（简单入门推荐）【Link】](https://programming-dp.com/) | 
+| Programming Differential Privacy （Book）| Joseph P. Near and Chiké Abuah | 2021 | 讲诉了DP的概念定理和机制等，并附有简单代码呈现（简单入门推荐）[【Link】](https://programming-dp.com/) | 
 | The Algorithmic Foundations of Differential Privacy（Book） | Cynthia Dwork | 2014 | DP的定义理论，高级组合和相关机制等的完整证明推导（更加理论）[【拉普拉斯、严格差分、高斯机制、松弛差分】](https://www.bilibili.com/video/BV18r4y1j7Bs?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3) |
  | Differential Privacy From Theory to Practice （Book）| Ninghui Li | 2014 | 除了一些基本定理和机制，用了具体的实际例子讲诉了DP的用法及DP的伦理探讨（更加实用化）[【Chapter1、Chapter2】](https://www.bilibili.com/video/BV1br4y1J7Qn?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3),[原作者讲解]()|
 
