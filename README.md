@@ -206,7 +206,6 @@ TO DO
 | :------------| :------ | :---------- | :----------------------- 
 | Learning differentially private recurrent language models | H. B. McMahan |  Learning/2017 |首次提出了DP-FedAvg和DP-FedSGD，采样是对客户端进行采样，加噪在中心方。敏感度的计算基于采样率，每个client的联邦权重得到。[【vedio】](https://www.bilibili.com/video/BV1fd4y1A7LD?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
 |Differentially private federated learning: A client level perspective| R. C. Geyer | Cryptography and Security/2017 | 和DP-FedAvg的区别在于客户端上传的模型在中心方进行裁剪，这样就可以进行自适应的裁剪操作（比如取各个客户端模型的范数中值作为裁剪范数）| 
-| Federated Learning with Differential Privacy: Algorithms and Performance Analysis | Nanjing University of Science and Technology | IEEE Transactions on Information Forensics and Security/2019 | 先进行上行链路的隐私保护，然后再基于上行链路的加噪再对下行链路进行加噪，给出了收敛性分析。本篇论文虽然在本地模型加噪，但是敏感度的选择是基于客户端数量，属于client-level| 
 | Differentially Private Federated Learning with Local Regularization and Sparsification | Chinese Academy of Sciences | 2021                                               | 本地对模型之差进行裁剪加噪，并提出了对应的正则化和稀疏化方法                                                                                                                                                                                        
 | Make Landscape Flatter in Differentially Private Federated Learning | TsingHua                    | 2021                                               | 提出的算法集成了Sharpness Aware Minimization（SAM）优化器，以生成具有更好稳定性和权重扰动鲁棒性的局部平面度模型，这导致局部更新的范数较小                                                  
 #### sample-Level
@@ -220,6 +219,8 @@ TO DO
 | Federated f-Differential Privacy | University of Pennsylvania | AISTATS/2021 | 样本级的差分隐私保护，提出了强联邦和弱联邦（个人认为弱联邦没什么意义），隐私度量采用GDP                                                                                                                                                                                                          | 
 | Adap DP-FL: Differentially Private Federated Learning with Adaptive Noise  | Jie Fu | Trustcom/2022 | 主要是两个自适应点，一个是不同客户端不同轮的自适应裁剪范数，一个是不同轮的自适应噪声系数衰减。                                                                                                                                                                                                        | 
 | DPAUC: Differentially Private AUC Computation in Federated Learning  | Jiankai Sun | 2022 | 作者举了一个联邦下客户端模型根据本地测试集进行性能评测算出AUC给中心方的场景，该场景认为AUC（ROC curve）会泄露客户端本地测试集隐私信息，故在传给中心方相关FP和FN等数值上加拉普拉斯噪声进行隐私保护。                                                                                                                                            | 
+| Federated Learning with Differential Privacy: Algorithms and Performance Analysis | Nanjing University of Science and Technology |TIFS/2019 | 先进行上行链路的隐私保护，然后再基于上行链路的加噪再对下行链路进行加噪，给出了收敛性分析。相邻数据集的定义是sample-level的| 
+
 #### LDP-FL
 上面的会把模型或者模型之差看成一个整体，将其看成一个高维数据。
 敏感度的计算一般是逐个元素单独裁剪，后面进行隐私预算累加。但是也可以将整个模型或者模型之差看成一个整体进行二范数的裁剪。
