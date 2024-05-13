@@ -1,9 +1,12 @@
-# Papers
+
 
 <!-- [![Stars](https://img.shields.io/github/stars/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data.svg?color=orange)](https://github.com/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data/stargazers)  [![Awesome](https://awesome.re/badge-flat.svg)](https://awesome.re) [![License](https://img.shields.io/github/license/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data.svg?color=green)](https://github.com/youngfish42/image-registration-resources/blob/master/LICENSE) ![](https://img.shields.io/github/last-commit/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data) -->
 
-bilibili（论文分享）:https://space.bilibili.com/80356866/video
+Person Website（个人主页）: https://jefffffffu.github.io/ 
 
+bilibili（论文视频分享）:https://space.bilibili.com/80356866/video
+
+# Papers Organization
 **Table of Contents**
 
 - [Papers](#Papers)
@@ -26,13 +29,18 @@ bilibili（论文分享）:https://space.bilibili.com/80356866/video
     - [GNN](#gnn)
     - [GNN with DP](#gnn-with-dp)
     - [Privacy of GNN](#privacy-of-gnn)
-  - [DP and Federated Leaning](#dp-and-federated-learning)  
-    - [Federated Leaning](#federated-leaning) 
-    - [Horizontal FL with DP](#horizontal-fl-with-dp)
-      - [client-level](#client-level)
-      - [samping-level](#samping-level)
-      - [LDP FL](#ldp-fl)
-    - [vertical FL with DP](#vertical-fl-with-dp)
+  - [Federated Learning](#federated-leaning)
+  - [Differentlly Private FL](#differentilly-private-fl)
+    - [HFL](#hfl)
+      - [DP-HFL](#dp-hfl)
+        - [SL-DP](#sl-dp)
+        - [CL-DP](#cl-dp)
+      - [LDP-HFL](#ldp-hfl)
+      - [shuffle model-HFL](#shuffle-model-hfl)
+        - [Shuffle model with SL-DP](#shuffle-model-with-sl-dp)
+        - [Shuffle model with CL-DP](#shuffle-model-with-cl-dp)
+    - [VFL](#vfl)
+    - [TFL](#tfl)
     - [incentive](#incentive)
   - [Attack](#attack)
     - [MIA](#membership-inference-attack)
@@ -173,9 +181,8 @@ TO DO
 | Group property inference attacks against graph neural networks                                                                      | Stevens             | CCS/2022       | 提出了节点的组标签攻击。比如一个图中有两种标签：男和女。通过攻击揭露这两种标签在图中的占比。| 
 
 
-## DP and Federated Learning
 
-### Federated Leaning
+## Federated Leaning
 想看更多的联邦学习文献推荐可以转到 :
 
 [Awesome-Federated-Learning-on-Graph-and-GNN-papers](https://github.com/huweibo/Awesome-Federated-Learning-on-Graph-and-GNN-papers) 
@@ -193,22 +200,21 @@ TO DO
 | Layer-wised Model Aggregation for Personalized Federated Learning                                | Hong Kong Polytechnic University | CVPR/2022                                                | 中心方的加权平均上对每个客户端的模型每层的参数对实现了个性化的加权，权重的生成利用超网络，对每个客户端每层参数进行再学习，用每个客户端的模型和上一轮中心方模型的差当作损失值进行最小化。后面进一步为了降低通讯成本，选择本地保留权重大的层不参与联邦。 [【vedio】](https://www.bilibili.com/video/BV1P8411L7EE/?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3) |                                                                                    | 
 | Tackling the Objective Inconsistency Problem in Heterogeneous Federated Optimization                               | Carnegie Mellon University       | NIPS/2020                                                | 考虑了不同客户端的算力不同，假设客户端存在异质的算力资源（即不同的本地迭代次数的能力）提出FedNova算法。                                                                                                                                                                                                                    |                                                                                    | 
 
-#### PFL
+### PFL
 一种个性化联邦学习，学习的目标在于各个客户端学到一个在本地数据集上表现效果好的模型。
 | Ditto: Fair and robust federated learning through personalization                               | T Li                             | ICML/2021                                                | 个性化的联邦学习（以本地客户端数据作为性能测试标准），其中引入公平性和鲁棒性的指标。算法在传统的FedAvg的基础上每个客户端多了本地模型的训练，本地模型的训练在损失函数上加了本地模型和全局模型的差作为正则化项。主要训练出每个客户端的本地模型。                                                                                                                                                 |                                                                                    | 
 | FedALA: Adaptive Local Aggregation for Personalized Federated Learning                               | Jianqian Zhan                             | AAAI/2020                                                | 本地自适应聚合中心方模型和上一轮本地训练的模型。本地再通过梯度下降，以本地数据集为loss来学习这个本地聚合权重w，以实现每次自适应的权重w。
-### Horizontal-FL with DP
 
-#### client-Level
-保护的是客户端的参与信息,将客户端的模型看成一个数据,联邦中心方非敌手
+                                                                                                                                        
 
-| Title | Team/Main Author | Venue and Year | Key Description 
-| :------------| :------ | :---------- | :----------------------- 
-| Learning differentially private recurrent language models | H. B. McMahan |  Learning/2017 |首次提出了DP-FedAvg和DP-FedSGD，采样是对客户端进行采样，加噪在中心方。敏感度的计算基于采样率，每个client的联邦权重得到。[【vedio】](https://www.bilibili.com/video/BV1fd4y1A7LD?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
-|Differentially private federated learning: A client level perspective| R. C. Geyer | Cryptography and Security/2017 | 和DP-FedAvg的区别在于客户端上传的模型在中心方进行裁剪，这样就可以进行自适应的裁剪操作（比如取各个客户端模型的范数中值作为裁剪范数）| 
-| Differentially Private Federated Learning with Local Regularization and Sparsification | Chinese Academy of Sciences | 2021                                               | 本地对模型之差进行裁剪加噪，并提出了对应的正则化和稀疏化方法                                                                                                                                                                                        
-| Make Landscape Flatter in Differentially Private Federated Learning | TsingHua                    | 2021                                               | 提出的算法集成了Sharpness Aware Minimization（SAM）优化器，以生成具有更好稳定性和权重扰动鲁棒性的局部平面度模型，这导致局部更新的范数较小                                                  
-#### sample-Level
+
+## Differentilly Private FL
+
+
+### HFL
+
+#### DP-HFL
+##### SL-DP
 保护客户端下样本的参与信息，每个客户端下的样本看成一个数据，将联邦中心方看成敌手
 
 | Title | Team/Main Author | Venue and Year | Key Description                                                                                                                                                                                                                                        
@@ -221,7 +227,17 @@ TO DO
 | DPAUC: Differentially Private AUC Computation in Federated Learning  | Jiankai Sun | 2022 | 作者举了一个联邦下客户端模型根据本地测试集进行性能评测算出AUC给中心方的场景，该场景认为AUC（ROC curve）会泄露客户端本地测试集隐私信息，故在传给中心方相关FP和FN等数值上加拉普拉斯噪声进行隐私保护。                                                                                                                                            | 
 | Federated Learning with Differential Privacy: Algorithms and Performance Analysis | Nanjing University of Science and Technology |TIFS/2019 | 先进行上行链路的隐私保护，然后再基于上行链路的加噪再对下行链路进行加噪，给出了收敛性分析。相邻数据集的定义是sample-level的| 
 
-#### LDP-FL
+##### CL-DP
+保护的是客户端的参与信息,将客户端的模型看成一个数据,联邦中心方非敌手
+
+| Title | Team/Main Author | Venue and Year | Key Description 
+| :------------| :------ | :---------- | :----------------------- 
+| Learning differentially private recurrent language models | H. B. McMahan |  Learning/2017 |首次提出了DP-FedAvg和DP-FedSGD，采样是对客户端进行采样，加噪在中心方。敏感度的计算基于采样率，每个client的联邦权重得到。[【vedio】](https://www.bilibili.com/video/BV1fd4y1A7LD?spm_id_from=333.999.0.0&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
+|Differentially private federated learning: A client level perspective| R. C. Geyer | Cryptography and Security/2017 | 和DP-FedAvg的区别在于客户端上传的模型在中心方进行裁剪，这样就可以进行自适应的裁剪操作（比如取各个客户端模型的范数中值作为裁剪范数）| 
+| Differentially Private Federated Learning with Local Regularization and Sparsification | Chinese Academy of Sciences | 2021                                               | 本地对模型之差进行裁剪加噪，并提出了对应的正则化和稀疏化方法                                                                                                                                                                                        
+| Make Landscape Flatter in Differentially Private Federated Learning | TsingHua                    | 2021                                               | 提出的算法集成了Sharpness Aware Minimization（SAM）优化器，以生成具有更好稳定性和权重扰动鲁棒性的局部平面度模型，这导致局部更新的范数较小                                                  
+
+#### LDP-HFL
 上面的会把模型或者模型之差看成一个整体，将其看成一个高维数据。
 敏感度的计算一般是逐个元素单独裁剪，后面进行隐私预算累加。但是也可以将整个模型或者模型之差看成一个整体进行二范数的裁剪。
 或者没有客户端中心方做小批量梯度下降，一般这种场景一个客户端只有一个样本数据，如果有多个样本数据会训练多个梯度上传给联邦中心方
@@ -234,16 +250,21 @@ TO DO
 | Shuffle Gaussian Mechanism for Differential Privacy | Seng Pei Liew               | 2022                                               | 本地客户端进行高斯加噪后得到一个梯度，然后对不同客户端的梯度进行shuffle进行隐私放大。并用不放回随机采样和泊松采样的高斯机制结合shuffle进行理论证明（基于RDP）。                                                                                                                                                                                                      
 | The Privacy Blanket of the Shuffle Model | Borja Balle                 | 2019                                               | 最为经典的shuffle证明。首先指出，对于shuffle模型，整个shuffle中的数据集应当看成整体，从而才有相邻数据集，针对这个数据集整体满足差分隐私。其次，采用数据相关和数据无关将整体数据分割成两部分，最大化敌手，使得最后只需要分析数据无关的部分，即隐私毯子，随机性在隐私毯子中。[【vedio】](https://www.bilibili.com/video/BV14W4y1b7VK?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3) 
 | Hiding Among the Clones: A Simple and Nearly Optimal Analysis of Privacy Amplification by Shuffling | Vitaly Feldman              | 2020                                               | 和隐私毯子类似的证明思想，不过假设的敌手知道的背景知识没有隐私毯子那么全面，每一个扰动的输出都会影响隐私性。在数据相关部分，进一步分成p/2和p/2进行分析。得到的隐私界比隐私毯子更紧凑。                                                                                                                                                                                                
-                                                                                                                                           
+   
+#### Shuffle model-HFL
+##### Shuffle model with SL-DP
 
-#### Incentive
+##### Shuffle model with CL-DP
+
+### Incentive
 | Title | Team/Main Author | Venue and Year | Key Description 
 | :------------| :------ | :---------- | :----------------------- 
-| Pain-FL: Personalized Privacy-Preserving Incentive for Federated Learning|  Chinese University of Hong Kong | IEEE Journal on Selected Areas in Communications /2021 | 基于差分隐私联邦学习的激励，tradeoff点在于客户端希望多加噪声保护本地数据，中心方希望客户端少加噪声获得高准确率模型，于是一开始就签订协议，协议对应的是噪声保护程度和奖励，即越少加噪，就获得奖励越多。但是噪声保护程度各个客户端一开始就定好了，假定各个客户端是理性的。中心方根据签订好的锲约，进行客户端采样联邦，选择隐私保护力度小的客户端参与联邦。| 
+| Pain-FL: Personalized Privacy-Preserving Incentive for Federated Learning|  Chinese University of Hong Kong | IEEE Journal on Selected Areas in Communications /2021 | 基于差分隐私联邦学习的激励，tradeoff点在于客户端希望多加噪声保护本地数据，中心方希望客户端少加噪声获得高准确率模型，于是一开始就签订协议，协议对应的是噪声保护程度和奖励，即越少加噪，就获得奖励越多。但是噪声保护程度各个客户端一开始就定好了，假定各个客户端是理性的。中心方根据签订好的锲约，进行客户端采样联邦，选择隐私保护力度小的客户端参与联邦。|
 
-### Vertical-FL with DP
+### VFL
 这个是未来可以研究的一个方向，针对纵向联邦的分层网络的场景进行差分隐私保护
 
+### TFL
 [视频讲解](https://www.bilibili.com/video/BV14g411V7nZ?p=8&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)
 
 ## Attack
@@ -261,6 +282,8 @@ TO DO
 | FLAME: Taming Backdoors in Federated Learning       | Technical University of Darmstadt            | USENIX /2022                                    | 在差分隐私结合联邦场景中提出了FLAME， 使用模型聚类（基础假设为后门训练的权重和良性权重存在较大的方向偏差）和权重裁剪（采用中位数进行裁剪，基础假设是后门敌手不会超过总客户端的一半）方法。这确保了 FLAME 可以在有效消除对抗性后门的同时保持聚合模型的良性性能。实验表明加很少的噪声就可以非常有效的抵御后门攻击，应该是裁剪对后门的作用大。 |                                                                                              
 
 ### Membership Inference Attack
+| Title                                                                                   | Team/Main Author           | Venue and Year                                  | Key Description                                                                                                                                                              
+|:----------------------------------------------------------------------------------------|:---------------------------|:------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Gradient-Leaks: Enabling Black-box Membership Inference Attacks against Machine Learning Models       | HUST            | TIFS /2023                                    | 因为每条数据都会对梯度更新产生影响，利用每个数据独有的梯度，用自编码器得出梯度背后的隶属度信息（瓶颈为隶属度相关的几个特征），无监督学习；利用构造局部模型的方式求某条data的梯度（类似可解释性AI中的LIME方法） |                                                                                              
 | TEAR: Exploring Temporal Evolution of Adversarial Robustness for Membership Inference Attacks Against Federated Learning       | HUST            | TIFS /2023                                    | 每个client能访问本地的全部训练信息，并在每一轮全局下发的时候得到全模型预测接口，可进行label only的预测；攻击方client用自身数据的对抗鲁棒性作为特征，训练二分类模型进行对其他client的MIA（本文假设各个client数据异质性不强）。攻击时利用对抗鲁棒性随时间变化（收敛趋势）的特性得出隶属信息；利用fL决策边界会逐渐拟合训练集而非测试集；决策边界和训练数据的额距离越大，越不易受对抗性扰动，将此距离作为对抗鲁棒性的度量，训练过程中持续收集该性质，作为隶属度特征。 |                                                                                              
 | Membership Inference via Backdooring       | Auckland            | IJCAI /2022                                    | 这个场景是数据拥有者判断自己的敏感数据集有没有用于某个模型训练，对自己数据集的少部分进行标记（trigger），利用这部分数据进行隶属推断，模型将学到trigger和目标标签的相关性。利用成员推理来判断自己标记的数据集在不在训练数据集中 |                                                                                              
@@ -269,6 +292,8 @@ TO DO
 ### copyright protection
 一般使用后门植入进行版权保护 
 
+| Title | Team/Main Author | Venue and Year | Key Description 
+| :------------| :------ | :---------- | :-----------------------
 | Radioactive Data: Tracing Through Training       | Facebook            | PMLR /2020                                    | 对于数据集版权保护问题，通过在样本中引入不可察觉的变化（放射性），来跟踪特定的数据是否被用于训练模型，根据模型输出判断被保护的数据是否被用于该模型的训练。在数据的潜在空间中添加标记（一个方向向量），使用标记将特征移向某个方向，再把标记从特征空间反向传回像素；这些标记在整个训练过程中保持可检测，最后算分类层权重和这个标记向量的余弦相似度，通过统计检验p-value来验证是否使用了标记数据 |                                                                                              
 
 ## Application Scenarios
@@ -304,9 +329,13 @@ TO DO
 
 ## Meachine unlearning
 ## Unlearning in Centralized machine learning 
+| Title | Team/Main Author | Venue and Year | Key Description 
+| :------------| :------ | :---------- | :-----------------------
 | When Machine Unlearning Jeopardizes Privacy | CMU | CCS/2021 | 提出unlearn会造成隐私泄露，可以根据unlearn前后单目标的后验概率的差异判断数据是否被删；两种聚合unlearn前后的后验概率的方案，作为攻击模型的输入，concatenating（在过拟合模型攻击效果好）/求差（在泛化性能好的模型攻击效果好）。2个指标衡量损失了多少隐私（目标样本置信度高于经典MIA的比例&置信度增量的平均值）并提出4个防御方案| 
 
 ## Unlearning in FL
+| Title | Team/Main Author | Venue and Year | Key Description 
+| :------------| :------ | :---------- | :-----------------------
 | FedEraser: Enabling Efficient Client-Level Data Removal from Federated Learning Models | HUST | IWQOS/2022 | 牺牲中心方的内存，每隔几轮存储各个client的更新增量；指出client的更新指示全局模型变化的方向；利用少量的矫正训练的到的更新指示方向，用保存的更新提供幅度，得出unlearn后的更新（旧update的幅值+矫正训练update的方向）；用类似相位的方法评价unlearn后的模型与retrain的模型的相似度| 
 | Federated Unlearning: How to Efficiently Erase a Client in FL?  | IBM | Arxiv/2022 | client自行完成unlearn，无需中心方全局访问数据，无需存储历史记录；client对自身训练过程有较大权限。请求遗忘的client自行用下发的全局模型，和前一时刻自身局部模型，算出其他client的平均（近似）作为参考模型；做用PGD梯度上升（PGD），约束为和参考模型的距离不能太大| 
 | Federated Unlearning via Class-Discriminative Pruning  | PolyU | WWW/2022 | 专注图像分类任务，忘记一类标签数据，每个client都需上传通道和类别之间的关联度，中心方聚合后，用TF-IDF指标评估相关性，剪枝，下发，微调恢复精度。client上传的关联度类似可解释性AI中的可视化方法；TF- IDF时NLP中衡量word与一堆文档中某个文档的关联性的指标；本文算法不需明确具体需要删除的data，删的是一类label| 
