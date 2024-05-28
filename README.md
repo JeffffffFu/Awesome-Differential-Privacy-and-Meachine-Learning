@@ -7,6 +7,9 @@ Person Website（个人主页）: https://jefffffffu.github.io/
 bilibili（论文视频分享）:https://space.bilibili.com/80356866/video
 
 关于DP-FL更完整更系统的总结，请查阅：https://arxiv.org/abs/2405.08299
+
+推荐一个DP社区：https://differentialprivacy.org/
+
 # Papers Organization
 **Table of Contents**
 
