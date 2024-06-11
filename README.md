@@ -2,7 +2,7 @@
 
 <!-- [![Stars](https://img.shields.io/github/stars/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data.svg?color=orange)](https://github.com/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data/stargazers)  [![Awesome](https://awesome.re/badge-flat.svg)](https://awesome.re) [![License](https://img.shields.io/github/license/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data.svg?color=green)](https://github.com/youngfish42/image-registration-resources/blob/master/LICENSE) ![](https://img.shields.io/github/last-commit/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data) -->
 
-Person Website（个人主页）: https://j[answer_financial_report_202404_query_with_gpt4.jsonl](..%2F..%2FUsers%2FAdministrator%2FDownloads%2Fanswer_financial_report_202404_query_with_gpt4.jsonl)efffffffu.github.io/ 
+Person Website（个人主页）: https://Jefffffffu.github.io/ 
 
 bilibili（论文视频分享）:https://space.bilibili.com/80356866/video
 
@@ -14,7 +14,7 @@ bilibili（论文视频分享）:https://space.bilibili.com/80356866/video
   - [DP Theory](#dp-theory)  
     - [Differential Adversary Definition](#differential-adversary-definition)
       - [CDP](#cdp)  
-      - [LDP](#ldp) [answer_financial_report_202404_query_with_gpt4.jsonl](..%2F..%2FUsers%2FAdministrator%2FDownloads%2Fanswer_financial_report_202404_query_with_gpt4.jsonl)
+      - [LDP](#ldp) 
     - [Privacy Measurement Method](#privacy-measurement-method)
       - [DP](#dp)
       - [RDP(MA)](#rdpma)
@@ -172,19 +172,20 @@ TO DO
 | Graph Sparsification via Meta-Learning                                                                                                 | Graph Sparsification via Meta-Learning| ICDE(workshop)/2021 | 在节点分类任务中，通过对邻接矩阵求导来进行邻接矩阵的稀疏化，对应边为1的地方，求导梯度值越大，越应该置为0                     | 
 
 ### GNN with DP
-| Title                                                                                                                                  | Team/Main Author                                             | Venue and Year      | Key Description                                                                                            
-|:---------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------|:--------------------|:-----------------------------------------------------------------------------------------------------------
-| GAP: Differentially Private Graph Neural Networks with Aggregation Perturbation                                                        | Sina Sajadmanesh                                             | USENIX/2023         | 在非端到端的图机器学习中，提出边级别和节点级别的图差分隐私。其主要想法是在消息传递，即特征聚合的时候利用CDP的概念进行加噪，在聚合前进行特征归一化从而获得每个节点特征的l2范数的bound，以获得敏感度。    | 
-| Node-Level Differentially Private Graph Neural Networks                                                                                | Google                                                       | ICLR(workshop)/2022 | 将DPSGD应用到图的节点分类任务，主要是限制图的最大度，从而利用N叉树的总节点个数去算出每个节点在K跳的情况下影响到多少个节点的gradient，从而确定敏感度。并有一个针对这个场景的新的采样放大的隐私预算推导 | 
-| SoK: Differential Privacy on Graph-Structured Data                                                                                     | SoK: Differential Privacy on Graph-Structured Data           | Arxiv/2022          | 图结合DP的综述文章                                                                                                 | 
-
+| Title                                                                                        | Team/Main Author  | Venue and Year      | Key Description                                                                                                      
+|:---------------------------------------------------------------------------------------------|:------------------|:--------------------|:---------------------------------------------------------------------------------------------------------------------
+| GAP: Differentially Private Graph Neural Networks with Aggregation Perturbation              | Sina Sajadmanesh  | USENIX/2023         | 在非端到端的图机器学习中，提出边级别和节点级别的图差分隐私。其主要想法是在消息传递，即特征聚合的时候利用CDP的概念进行加噪，在聚合前进行特征归一化从而获得每个节点特征的l2范数的bound，以获得敏感度。              | 
+| Node-Level Differentially Private Graph Neural Networks                                      | Google            | ICLR(workshop)/2022 | 将DPSGD应用到图的节点分类任务，主要是限制图的最大度，从而利用N叉树的总节点个数去算出每个节点在K跳的情况下影响到多少个节点的gradient，从而确定敏感度。并有一个针对这个场景的新的采样放大的隐私预算推导           | 
+| SoK: Differential Privacy on Graph-Structured Data                                           | T. Mueller et al. | Arxiv/2022          | 图结合DP的综述文章                                                                                                           |
+| PrivGraph: Differentially Private Graph Data publication by Exploiting Community Information | ZJU               | USENIX/2023         | 是一个边DP的图生成工作，其利用了LM先进行社区划分（社区划分的时候对初的社区信息添加LAP），后面根据社区间的信息和社区内的信息进行图生成，借助了CL model进行重生成。重生成之前对社区间的信息和社区内的信息添加LAP进行扰动 | 
 
 ### Privacy of GNN
-| Title                                                                           | Team/Main Author | Venue and Year | Key Description                                                                                                                                                                                                                                                                         
-|:--------------------------------------------------------------------------------|:-----------------|:---------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-| Disparate Vulnerability in Link Inference Attacks against Graph Neural Networks | Stevens          | PETS/2023      | 提出了图中组（针对标签）密度不均匀会加大敏感边的泄露的问题。假设有A，B两种节点标签，这里就存在三组边的联系，A和A，A和B，B和B。A-A组的密度定义为实际这个图中A-A连接的边数除以全部A-A有可能的边数。文章的idea是在训练GNN的过程中，通过扰动（加边或删边）的方式让各组的密度差异不大，进而保护边隐私。                                                                                                                           | 
-| linkteller: recovering private edges from graph neural networks via influence analysis                                                                      | UIUC             | S&P/2022       | 构建了一个纵向图联邦的场景，一方持有特征和标签（public），一方持有边(private)。提出了一种攻击方式，每次改变一个节点的特征观察GNN的输出，去判断节点之间连接关系，本质是一种差分攻击。文章后面提出了用DP进行保护，分别是lap和RR。| 
-| Group property inference attacks against graph neural networks                                                                      | Stevens             | CCS/2022       | 提出了节点的组标签攻击。比如一个图中有两种标签：男和女。通过攻击揭露这两种标签在图中的占比。| 
+| Title                                                                                  | Team/Main Author | Venue and Year | Key Description                                                                                                                                               
+|:---------------------------------------------------------------------------------------|:-----------------|:---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Disparate Vulnerability in Link Inference Attacks against Graph Neural Networks        | Stevens          | PETS/2023      | 提出了图中组（针对标签）密度不均匀会加大敏感边的泄露的问题。假设有A，B两种节点标签，这里就存在三组边的联系，A和A，A和B，B和B。A-A组的密度定义为实际这个图中A-A连接的边数除以全部A-A有可能的边数。文章的idea是在训练GNN的过程中，通过扰动（加边或删边）的方式让各组的密度差异不大，进而保护边隐私。 | 
+| linkteller: recovering private edges from graph neural networks via influence analysis | UIUC             | S&P/2022       | 构建了一个纵向图联邦的场景，一方持有特征和标签（public），一方持有边(private)。提出了一种攻击方式，每次改变一个节点的特征观察GNN的输出，去判断节点之间连接关系，本质是一种差分攻击。文章后面提出了用DP进行保护，分别是lap和RR。                                  | 
+| Group property inference attacks against graph neural networks                         | Stevens          | CCS/2022       | 提出了节点的组标签攻击。比如一个图中有两种标签：男和女。通过攻击揭露这两种标签在图中的占比。                                                                                                                | 
+| GraphGAN: Graph Representation Learning with Generative Adversarial Nets               | SJTU             | AAAI/2017      | 基于生成对抗网络进行图的边的重生成，其目标是生成的边和原来的边尽量的相同。生成器会随机选择某几个节点作为该节点的邻居，而判别器给这些邻居节点打分，基于该节点附近选择的真实邻居作为评判标准来鉴别。生成器和判别器同时优化一个损失函数                                            | 
 
 
 
