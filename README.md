@@ -2,7 +2,7 @@
 
 <!-- [![Stars](https://img.shields.io/github/stars/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data.svg?color=orange)](https://github.com/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data/stargazers)  [![Awesome](https://awesome.re/badge-flat.svg)](https://awesome.re) [![License](https://img.shields.io/github/license/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data.svg?color=green)](https://github.com/youngfish42/image-registration-resources/blob/master/LICENSE) ![](https://img.shields.io/github/last-commit/youngfish42/Awesome-Federated-Learning-on-Graph-and-Tabular-Data) -->
 
-Person Website（个人主页）: https://jefffffffu.github.io/ 
+Person Website（个人主页）: https://j[answer_financial_report_202404_query_with_gpt4.jsonl](..%2F..%2FUsers%2FAdministrator%2FDownloads%2Fanswer_financial_report_202404_query_with_gpt4.jsonl)efffffffu.github.io/ 
 
 bilibili（论文视频分享）:https://space.bilibili.com/80356866/video
 
@@ -14,7 +14,7 @@ bilibili（论文视频分享）:https://space.bilibili.com/80356866/video
   - [DP Theory](#dp-theory)  
     - [Differential Adversary Definition](#differential-adversary-definition)
       - [CDP](#cdp)  
-      - [LDP](#ldp) 
+      - [LDP](#ldp) [answer_financial_report_202404_query_with_gpt4.jsonl](..%2F..%2FUsers%2FAdministrator%2FDownloads%2Fanswer_financial_report_202404_query_with_gpt4.jsonl)
     - [Privacy Measurement Method](#privacy-measurement-method)
       - [DP](#dp)
       - [RDP(MA)](#rdpma)
@@ -208,7 +208,10 @@ TO DO
 
 ### PFL
 一种个性化联邦学习，学习的目标在于各个客户端学到一个在本地数据集上表现效果好的模型。
-| Ditto: Fair and robust federated learning through personalization                               | T Li                             | ICML/2021                                                | 个性化的联邦学习（以本地客户端数据作为性能测试标准），其中引入公平性和鲁棒性的指标。算法在传统的FedAvg的基础上每个客户端多了本地模型的训练，本地模型的训练在损失函数上加了本地模型和全局模型的差作为正则化项。主要训练出每个客户端的本地模型。                                                                                                                                                 |                                                                                    | 
+
+| Title                                                                                            | Team/Main Author                 | Venue and Year                                           | Key Description                                                                                                                                                                                                                                                            
+|:-------------------------------------------------------------------------------------------------|:---------------------------------|:---------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Ditto: Fair and robust federated learning through personalization                               | T Li                             | ICML/2021                                                | 个性化的联邦学习（以本地客户端数据作为性能测试标准），其中引入公平性和鲁棒性的指标。算法在传统的FedAvg的基础上每个客户端多了本地模型的训练，本地模型的训练在损失函数上加了本地模型和全局模型的差作为正则化项。主要训练出每个客户端的本地模型。                                                                                                                                                 |                                                                                    |
 | FedALA: Adaptive Local Aggregation for Personalized Federated Learning                               | Jianqian Zhan                             | AAAI/2020                                                | 本地自适应聚合中心方模型和上一轮本地训练的模型。本地再通过梯度下降，以本地数据集为loss来学习这个本地聚合权重w，以实现每次自适应的权重w。
 
                                                                                                                                         
@@ -291,7 +294,7 @@ LDP-HFL 可视为基于 LDP 的均值估计问题，因为每个模型参数都�
 | Safeguarding cross-silo federated learning with local differential privacy | Wang et al.                  | DCN/2022         | 用PAPPOR进行本地扰动，并提出可以抵御重构攻击                                                                                                                                                                                             
 | Signds-fl: Local differentially private federated learning with sign-based dimension selection | Jiang et al.                 | TIST/2022       | 将TOP-K扩展到多维参数选择，并提出多维下的EM机制                                                                                                                                                                                              
 | FedTA: Locally-Differential Federated Learning with Top-k Mechanism and Adam Optimization | Li et al.                    | ICUS/2022        | 在TOP-K的基础上提出本地进行Adam下降，然后添加拉普拉斯噪声
-| LDP-FL: Practical Private Aggregation in Federated Learning with Local Differential Privacy | Sun et al.                   | IJCAI/2021        | 在TOP-K的基础上提出本地进行Adam下降，然后添加拉普拉斯噪声
+| LDP-FL: Practical Private Aggregation in Federated Learning with Local Differential Privacy | Sun et al.                   | IJCAI/2021        | 提出参数shuffle，认为参数shuffle后不需要对维度进行隐私预算分割
 | FedTA: Locally-Differential Federated Learning with Top-k Mechanism and Adam Optimization | Li et al.                    | ICUS/2022        | 自适应Duchi, 自适应的扰动区间对于模型参数的每层，并进行参数shuffle
 | Privacy-Enhanced Federated Learning: A Restrictively Self-Sampled and Data-Perturbed Local Differential Privacy Method | Zhao et al.                  | Electronics/2022        | 自适应Hormony机制，并进行参数shuffle
 | Towards Accurate and Stronger Local Differential Privacy for Federated Learning with Staircase Randomized Response |Varun et al.                 | DASC/2024       | 用SRR机制进行本地扰动， 并进行参数shuffle
