@@ -10,6 +10,27 @@ bilibili（论文视频分享）:https://space.bilibili.com/80356866/video
 
 推荐一个DP社区：https://differentialprivacy.org/
 
+# Citations
+以上的分类总结和代码来自于以下论文，如果你从以上总结得到了帮助或者你有使用相关代码，请您在文章中引用以下论文。这对我非常重要，谢谢。
+```bash
+@inproceedings{fu2022adap,
+  title={Adap dp-fl: Differentially private federated learning with adaptive noise},
+  author={Fu, Jie and Chen, Zhili and Han, Xiao},
+  booktitle={2022 IEEE International Conference on Trust, Security and Privacy in Computing and Communications (TrustCom)},
+  pages={656--663},
+  year={2022},
+  organization={IEEE}
+}
+```
+```bash
+@article{fu2024differentially,
+  title={Differentially private federated learning: A systematic review},
+  author={Fu, Jie and Hong, Yuan and Ling, Xinpeng and Wang, Leixia and Ran, Xun and Sun, Zhiyu and Wang, Wendy Hui and Chen, Zhili and Cao, Yang},
+  journal={arXiv preprint arXiv:2405.08299},
+  year={2024}
+}
+```
+
 # Papers Organization
 **Table of Contents**
 
@@ -402,4 +423,3 @@ shuffle相关的联邦文章本质上从把隐私保证LDP转到CDP，shuffle �
 | Federated Unlearning via Class-Discriminative Pruning  | PolyU | WWW/2022 | 专注图像分类任务，忘记一类标签数据，每个client都需上传通道和类别之间的关联度，中心方聚合后，用TF-IDF指标评估相关性，剪枝，下发，微调恢复精度。client上传的关联度类似可解释性AI中的可视化方法；TF- IDF时NLP中衡量word与一堆文档中某个文档的关联性的指标；本文算法不需明确具体需要删除的data，删的是一类label| 
 | FedRecovery: Differentially Private Machine Unlearning for Federated Learning Frameworks  | UTS | TIFS/2023 | 引入梯度残差的概念来量化增量效应，全局模型中删除梯度残差的加权和来消除某个客户端的影响，并添加特定的高斯噪声，使得unlearn模型和retrain模型在统计上不可区分。梯度残差通过计算前一时间点的模型与当前模型的梯度差得到。| 
 
-# Code
