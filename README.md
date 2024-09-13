@@ -51,9 +51,11 @@ bilibili（论文视频分享）:https://space.bilibili.com/80356866/video
   - [DP and Meachine Learning](#dp-and-meachine-learning)  
     - [Meachine Leaning](#meachine-learning)
     - [Meachine Leaning with DP](#meachine-learning-with-dp)
-    - [GNN](#gnn)
-    - [GNN with DP](#gnn-with-dp)
-    - [Privacy of GNN](#privacy-of-gnn)
+    - [Privacy of GNN](#privacy-of-GNN)
+      - [GNN](#gnn)
+      - [GNN with DP](#gnn-with-dp)
+      - [Privacy of GNN](#privacy-of-gnn)
+   - [DP Auditing](#dp-auditing)
   - [Federated Learning](#federated-leaning)
   - [Differentlly Private FL](#differentilly-private-fl)
     - [HFL](#hfl)
@@ -222,10 +224,8 @@ TO DO
 
 | Title                                                                                                                                  | Team/Main Author                      | Venue and Year      | Key Description                                                           
 |:---------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------|:--------------------|:--------------------------------------------------------------------------
-| Auditing Differentially Private Machine Learning: How Private is Private SGD?
-                                                        | Northeastern University                      | NIPS/2020            | 设计了一个更有效的投毒后门攻击来进行DPSGD的DP审计（攻击越强，DP审计越紧）。用检测一个神经网络模型是不是由投毒数据训练得到的来模拟推测这个神经网络是不是由D_1训练出来的。更有效的投毒后门攻击是指设计了一个抗裁剪的后门攻击。 | 
-| One-shot Empirical Privacy Estimation for Federated Learning
-                                                                                                 | google | ICLR/2024 | 设计了一个one-shot的高斯机制的DP审计。这个审计更通用，主要是通过高维和多个金丝雀来并行一次性计算模拟多次运行高斯的分布。然后用这个高斯机制的DP审计应用到client-level的FL中进行审计。                     | 
+| Auditing Differentially Private Machine Learning: How Private is Private SGD? | Northeastern University                      | NIPS/2020            | 设计了一个更有效的投毒后门攻击来进行DPSGD的DP审计（攻击越强，DP审计越紧）。用检测一个神经网络模型是不是由投毒数据训练得到的来模拟推测这个神经网络是不是由D_1训练出来的。更有效的投毒后门攻击是指设计了一个抗裁剪的后门攻击。 | 
+| One-shot Empirical Privacy Estimation for Federated Learning | google | ICLR/2024 | 设计了一个one-shot的高斯机制的DP审计。这个审计更通用，主要是通过高维和多个金丝雀来并行一次性计算模拟多次运行高斯的分布。然后用这个高斯机制的DP审计应用到client-level的FL中进行审计。                | 
 
 
 ## Federated Leaning
