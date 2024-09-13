@@ -189,13 +189,27 @@ TO DO
 | Local Differential Privacy for Deep Learning                                                    | RMIT University | IEEE Internet of Things/2020                        | 本篇文章给出了在下采样和池化层之后，对数据特征进行扰动，在进行全连接层之前进行扰动。比较核心在于对整个梯度进行编码，利用十进制转二进制，在进行比特的扰动。后文引入的优化方法的参数a存在偷换概念的问题，相当于引入了一个新的隐私预算，但是缺忽视掉了。                                                                                                                           | 
 | Differential Privacy Meets Neural Network Pruning                                                    | Kamil Adamczewski                           | arxiv/2023                                          | 文章将传统按权值剪枝的技术和DPSGD进行结合，确定剪枝的mask是通过公共数据集得到的。进行DPSGD结合有两点好处，一是在进行裁剪的时候，只对参与训练的神经元进行裁剪，也就是减少了裁剪幅度，也相当于double clip。其二加噪声时，只对参与训练的神经元加噪，这样减少了噪声对模型的影响，尤其在大模型下。                                                                                           | 
 
-### GNN 
+
+
+
+### Privacy of GNN
+
+#### GNN 
 | Title                                                                                                                                  | Team/Main Author                      | Venue and Year      | Key Description                                                           
 |:---------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------|:--------------------|:--------------------------------------------------------------------------
 | Federated Graph Machine Learning: A Survey of Concepts, Techniques, and Applications                                                        | University of Virginia                      | KDD/2022            | 图联邦学习综述，对于FL结合graph三种异质情况的分类：1、客户端之间点重合；2、客户端之间边缺失；3、客户端之间数据异质（这个和传统联邦一致） | 
-| Graph Sparsification via Meta-Learning                                                                                                 | Graph Sparsification via Meta-Learning| ICDE(workshop)/2021 | 在节点分类任务中，通过对邻接矩阵求导来进行邻接矩阵的稀疏化，对应边为1的地方，求导梯度值越大，越应该置为0                     | 
+| Graph Sparsification via Meta-Learning                                                                                                 | Tealx | ICDE(workshop)/2021 | 在节点分类任务中，通过对邻接矩阵求导来进行邻接矩阵的稀疏化，对应边为1的地方，求导梯度值越大，越应该置为0                     | 
+| GraphGAN: Graph Representation Learning with Generative Adversarial Nets               | SJTU             | AAAI/2017      | 基于生成对抗网络进行图的边的重生成，其目标是生成的边和原来的边尽量的相同。生成器会随机选择某几个节点作为该节点的邻居，而判别器给这些邻居节点打分，基于该节点附近选择的真实邻居作为评判标准来鉴别。生成器和判别器同时优化一个损失函数                                            | 
 
-### GNN with DP
+
+#### Privacy attack 
+| Title                                                                                  | Team/Main Author | Venue and Year | Key Description                                                                                                                                               
+|:---------------------------------------------------------------------------------------|:-----------------|:---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Disparate Vulnerability in Link Inference Attacks against Graph Neural Networks        | Stevens          | PETS/2023      | 提出了图中组（针对标签）密度不均匀会加大敏感边的泄露的问题。假设有A，B两种节点标签，这里就存在三组边的联系，A和A，A和B，B和B。A-A组的密度定义为实际这个图中A-A连接的边数除以全部A-A有可能的边数。文章的idea是在训练GNN的过程中，通过扰动（加边或删边）的方式让各组的密度差异不大，进而保护边隐私。 | 
+| linkteller: recovering private edges from graph neural networks via influence analysis | UIUC             | S&P/2022       | 构建了一个纵向图联邦的场景，一方持有特征和标签（public），一方持有边(private)。提出了一种攻击方式，每次改变一个节点的特征观察GNN的输出，去判断节点之间连接关系，本质是一种差分攻击。文章后面提出了用DP进行保护，分别是lap和RR。                                  | 
+| Group property inference attacks against graph neural networks                         | Stevens          | CCS/2022       | 提出了节点的组标签攻击。比如一个图中有两种标签：男和女。通过攻击揭露这两种标签在图中的占比。                                                                                                                | 
+
+#### GNN with DP
 | Title                                                                                        | Team/Main Author  | Venue and Year      | Key Description                                                                                                      
 |:---------------------------------------------------------------------------------------------|:------------------|:--------------------|:---------------------------------------------------------------------------------------------------------------------
 | GAP: Differentially Private Graph Neural Networks with Aggregation Perturbation              | Sina Sajadmanesh  | USENIX/2023         | 在非端到端的图机器学习中，提出边级别和节点级别的图差分隐私。其主要想法是在消息传递，即特征聚合的时候利用CDP的概念进行加噪，在聚合前进行特征归一化从而获得每个节点特征的l2范数的bound，以获得敏感度。              | 
@@ -203,14 +217,15 @@ TO DO
 | SoK: Differential Privacy on Graph-Structured Data                                           | T. Mueller et al. | Arxiv/2022          | 图结合DP的综述文章                                                                                                           |
 | PrivGraph: Differentially Private Graph Data publication by Exploiting Community Information | ZJU               | USENIX/2023         | 是一个边DP的图生成工作，其利用了LM先进行社区划分（社区划分的时候对初的社区信息添加LAP），后面根据社区间的信息和社区内的信息进行图生成，借助了CL model进行重生成。重生成之前对社区间的信息和社区内的信息添加LAP进行扰动 | 
 
-### Privacy of GNN
-| Title                                                                                  | Team/Main Author | Venue and Year | Key Description                                                                                                                                               
-|:---------------------------------------------------------------------------------------|:-----------------|:---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------
-| Disparate Vulnerability in Link Inference Attacks against Graph Neural Networks        | Stevens          | PETS/2023      | 提出了图中组（针对标签）密度不均匀会加大敏感边的泄露的问题。假设有A，B两种节点标签，这里就存在三组边的联系，A和A，A和B，B和B。A-A组的密度定义为实际这个图中A-A连接的边数除以全部A-A有可能的边数。文章的idea是在训练GNN的过程中，通过扰动（加边或删边）的方式让各组的密度差异不大，进而保护边隐私。 | 
-| linkteller: recovering private edges from graph neural networks via influence analysis | UIUC             | S&P/2022       | 构建了一个纵向图联邦的场景，一方持有特征和标签（public），一方持有边(private)。提出了一种攻击方式，每次改变一个节点的特征观察GNN的输出，去判断节点之间连接关系，本质是一种差分攻击。文章后面提出了用DP进行保护，分别是lap和RR。                                  | 
-| Group property inference attacks against graph neural networks                         | Stevens          | CCS/2022       | 提出了节点的组标签攻击。比如一个图中有两种标签：男和女。通过攻击揭露这两种标签在图中的占比。                                                                                                                | 
-| GraphGAN: Graph Representation Learning with Generative Adversarial Nets               | SJTU             | AAAI/2017      | 基于生成对抗网络进行图的边的重生成，其目标是生成的边和原来的边尽量的相同。生成器会随机选择某几个节点作为该节点的邻居，而判别器给这些邻居节点打分，基于该节点附近选择的真实邻居作为评判标准来鉴别。生成器和判别器同时优化一个损失函数                                            | 
 
+### DP auditing
+
+| Title                                                                                                                                  | Team/Main Author                      | Venue and Year      | Key Description                                                           
+|:---------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------|:--------------------|:--------------------------------------------------------------------------
+| Auditing Differentially Private Machine Learning: How Private is Private SGD?
+                                                        | Northeastern University                      | NIPS/2020            | 设计了一个更有效的投毒后门攻击来进行DPSGD的DP审计（攻击越强，DP审计越紧）。用检测一个神经网络模型是不是由投毒数据训练得到的来模拟推测这个神经网络是不是由D_1训练出来的。更有效的投毒后门攻击是指设计了一个抗裁剪的后门攻击。 | 
+| One-shot Empirical Privacy Estimation for Federated Learning
+                                                                                                 | google | ICLR/2024 | 设计了一个one-shot的高斯机制的DP审计。这个审计更通用，主要是通过高维和多个金丝雀来并行一次性计算模拟多次运行高斯的分布。然后用这个高斯机制的DP审计应用到client-level的FL中进行审计。                     | 
 
 
 ## Federated Leaning
