@@ -226,6 +226,9 @@ TO DO
 |:---------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------|:--------------------|:--------------------------------------------------------------------------
 | Auditing Differentially Private Machine Learning: How Private is Private SGD? | Northeastern University                      | NIPS/2020            | 设计了一个更有效的投毒后门攻击来进行DPSGD的DP审计（攻击越强，DP审计越紧）。用检测一个神经网络模型是不是由投毒数据训练得到的来模拟推测这个神经网络是不是由D_1训练出来的。更有效的投毒后门攻击是指设计了一个抗裁剪的后门攻击。 | 
 | One-shot Empirical Privacy Estimation for Federated Learning | google | ICLR/2024 | 设计了一个one-shot的高斯机制的DP审计。这个审计更通用，主要是通过高维和多个金丝雀来并行一次性计算模拟多次运行高斯的分布。然后用这个高斯机制的DP审计应用到client-level的FL中进行审计。                | 
+| Privacy Auditing with One (1) Training Run | Thomas Steinke | arxiv/2023 | 该文章提出的DP隐私审计更像是一种攻击，通过在训练集中随机插入数据，然后再对宣传满足DP的算法进行训练，通过观测输出来判断出入的数据有没有在训练数据集中，然后得到对应的eps。一般来说，文章认为当前的DPSGD算法的理论隐私下界太高，这篇文章通过经验实验给的隐私上界一般更紧。| 
+| Efficient Privacy Auditing in Federated Learning | NUS | USENIX/2024 | 该文章利用MIA攻击实现隐私审计，其优化了MIA攻击，利用多个模型的累计预测置信度作为指标来辨别是否为成员数据。| 
+| Low-Cost High-Power Membership Inference Attacks | google | ICML/2024 | 该文章是一篇MIA，文章给出了一个经典的成员推理游戏，基于该游戏其考虑了数据的分布，比如成员数据和非成员数据不是同分布的情况，其设计了一个score的计算方式，并用offline方法加快了推理攻击速度| 
 
 
 ## Federated Leaning
@@ -416,12 +419,6 @@ shuffle相关的联邦文章本质上从把隐私保证LDP转到CDP，shuffle �
 | :------------| :------ | :---------- | :----------------------- 
 | Efficient Differentially Private Secure Aggregation for Federated Learning via Hardness of Learning with Errors | University of Vermont | CCS/2021 | 该文章在原来的用同态加密进行联邦聚合的基础上，刻画了噪声的DP衡量，因为之前用的LWE天然存在噪声，所以该文章把这个噪声用DP量化出来。同时，也可以理解成其用同态加密的方法将原来的LDP加噪变成CDP的加噪方式，类似shuffle的理念。[【vedio】](https://www.bilibili.com/video/BV1fR4y1D7dU/?spm_id_from=333.999.list.card_archive.click&vd_source=46cfa74ab261e7d7a25c2bfedf5615a3)| 
 | Private, Efficient, and Accurate: Protecting Models Trained by Multi-party Learning with Differential Privacy | Fudan University | SP/2022 | 核心在于利用了多方安全的秘密分享构建出一个虚拟的联邦中心方，使的不同客户端的样本数据可以进行秘密分享后“集中”式训练，然后在再训练的梯度上加DP，以此满足模型的差分隐私。相较于之前的模型，该模型不用LDP,也不用shuffle，将所以客户端数据整合成集中式变成CDP的形式（这样可以用更小的eps，即不造成更大的精度损失），并且没有可信第三方。| 
-
-
-### DP and auditing
-| Title | Team/Main Author | Venue and Year | Key Description 
-| :------------| :------ | :---------- | :----------------------- 
-| Privacy Auditing with One (1) Training Run | Thomas Steinke | arxiv/2023 | 该文章提出的DP隐私审计更像是一种攻击，通过在训练集中随机插入数据，然后再对宣传满足DP的算法进行训练，通过观测输出来判断出入的数据有没有在训练数据集中，然后得到对应的eps。一般来说，文章认为当前的DPSGD算法的理论隐私下界太高，这篇文章通过经验实验给的隐私上界一般更紧。| 
 
 
 ## Meachine unlearning
