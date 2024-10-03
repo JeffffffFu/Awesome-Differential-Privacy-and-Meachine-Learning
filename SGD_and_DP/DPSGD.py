@@ -11,6 +11,7 @@ from torch import nn
 from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 
+from privacy_analysis.RDP.compute_dp_sgd import apply_dp_sgd_analysis
 from privacy_analysis.RDP.compute_rdp import compute_rdp
 from privacy_analysis.RDP.rdp_convert_dp import compute_eps
 from train_and_validation.train_with_dp import  train_dynamic_add_noise
@@ -18,7 +19,7 @@ from train_and_validation.validation import validation
 from openpyxl import Workbook
 import time
 
-def centralization_train_with_dp(train_data, test_data, model,batch_size, numEpoch, learning_rate,momentum,delta,max_norm,sigma):
+def centralization_train_with_dp(train_data, test_data, model,batch_size, iters, learning_rate,momentum,delta,max_norm,sigma):
 
 
     optimizer = DPSGD(
@@ -32,7 +33,7 @@ def centralization_train_with_dp(train_data, test_data, model,batch_size, numEpo
     )
 
     # 包装抽样函数
-    minibatch_size = batch_size  # 这里比较好的取值是根号n，n为每个客户端的样本数
+    minibatch_size = batch_size
     microbatch_size = 1  #这里默认1就好
     iterations = 1  # n个batch，这边就定一个，每次训练采样一个Lot
     minibatch_loader, microbatch_loader = get_data_loaders_uniform_without_replace(minibatch_size, microbatch_size, iterations)     #无放回均匀采样
@@ -44,22 +45,16 @@ def centralization_train_with_dp(train_data, test_data, model,batch_size, numEpo
 
     print("------ Centralized Model ------")
     rdp=0
-    orders = (list(range(2, 64)) + [128, 256, 512])  # 默认的lamda
-    epsilon_list=[]
-    result_loss_list=[]
-    result_acc_list=[]
-    for epoch in range(numEpoch):
+    orders = [1 + x / 10.0 for x in range(1, 100)] + list(range(11, 64))+ [128, 256, 512]
+
+    for iter in range(iters):  #注意，这里不是epoch，只是一次batch的迭代
 
         train_dl = minibatch_loader(train_data)     #抽样
 
-    #这里要动态加噪，每次传入的sigma可能会改变
         central_train_loss, central_train_accuracy = train_dynamic_add_noise(model, train_dl, optimizer)
         central_test_loss, central_test_accuracy = validation(model, test_dl)
-
-
-        if (epoch > 6200):
-            break
-
+        eps, opt_order = apply_dp_sgd_analysis(minibatch_size/len(train_data), sigma, iter, orders, 10 ** (-5))
+        print(f'test accuracy: {central_test_accuracy}, eps: {eps}, opt_order: {opt_order}')
 
     print("------ Training finished ------")
 
