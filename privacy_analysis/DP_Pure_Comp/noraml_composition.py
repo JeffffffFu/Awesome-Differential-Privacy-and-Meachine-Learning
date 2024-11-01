@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-#松弛差分隐私下，普通的组合，线性相乘
+#松弛差分隐私下，普通的组合，线性相乘，没有采样率q
 def compute_dp_of_advanced_composition(k,sigma,delta):
 
     if sigma <= 0:
@@ -11,5 +11,5 @@ def compute_dp_of_advanced_composition(k,sigma,delta):
         print ('k larger than 0.')
     if delta <= 0 or delta >=1:
         print ('delta must be larger than 0 and smaller than 1')
-    eps=math.sqrt(2*k*np.log(1.25/delta)/(sigma**2))
+    eps=math.sqrt(2*k*np.log(1.25/delta)/sigma
     return eps
