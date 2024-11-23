@@ -227,9 +227,9 @@ TO DO
 | Auditing Differentially Private Machine Learning: How Private is Private SGD? | Northeastern University                      | NIPS/2020            | 设计了一个更有效的投毒后门攻击来进行DPSGD的DP审计（攻击越强，DP审计越紧）。用检测一个神经网络模型是不是由投毒数据训练得到的来模拟推测这个神经网络是不是由D_1训练出来的。更有效的投毒后门攻击是指设计了一个抗裁剪的后门攻击。 | 
 | One-shot Empirical Privacy Estimation for Federated Learning | google | ICLR/2024 | 设计了一个one-shot的高斯机制的DP审计。这个审计更通用，主要是通过高维和多个金丝雀来并行一次性计算模拟多次运行高斯的分布。然后用这个高斯机制的DP审计应用到client-level的FL中进行审计。                | 
 | Privacy Auditing with One (1) Training Run | Thomas Steinke | arxiv/2023 | 该文章提出的DP隐私审计更像是一种攻击，通过在训练集中随机插入数据，然后再对宣传满足DP的算法进行训练，通过观测输出来判断出入的数据有没有在训练数据集中，然后得到对应的eps。一般来说，文章认为当前的DPSGD算法的理论隐私下界太高，这篇文章通过经验实验给的隐私上界一般更紧。| 
-| Efficient Privacy Auditing in Federated Learning | NUS | USENIX/2024 | 该文章利用MIA攻击实现隐私审计，其优化了MIA攻击，利用多个模型的累计预测置信度作为指标来辨别是否为成员数据。| 
-| Low-Cost High-Power Membership Inference Attacks | google | ICML/2024 | 该文章是一篇MIA，文章给出了一个经典的成员推理游戏，基于该游戏其考虑了数据的分布，比如成员数据和非成员数据不是同分布的情况，其设计了一个score的计算方式，并用offline方法加快了推理攻击速度| 
-
+| Efficient Privacy Auditing in Federated Learning | NUS | USENIX/2024 | 该文章利用MIA攻击实现联邦下的客户端隐私审计，本质是基于置信度进行成员推理，利用多个模型的累计预测置信度作为指标来辨别是否为成员数据。| 
+| Low-Cost High-Power Membership Inference Attacks | google | ICML/2024 | 该文章是一篇MIA, 叫RMIA，更鲁棒的成员推理攻击，文章给出了一个经典的成员推理游戏，基于该游戏其考虑了数据的分布，比如成员数据和非成员数据不是同分布的情况，其设计了一个score的计算方式，并用offline方法加快了推理攻击速度| 
+| Evaluations of Machine Learning Privacy Defenses are Misleading | ETH | CCS/2024 | 该文章基于RILA进行隐私审计，主要的贡献点是提出要通过攻击最脆弱的样本进行最坏情况下的隐私审计。文章通过植入金丝雀样本（OOD的样本，标签错误的样本，非常规样本），并推理金丝雀样本作为攻击的指标最后来确定隐私界| 
 
 ## Federated Leaning
 想看更多的联邦学习文献推荐可以转到 :
@@ -426,6 +426,7 @@ shuffle相关的联邦文章本质上从把隐私保证LDP转到CDP，shuffle �
 | Title | Team/Main Author | Venue and Year | Key Description 
 | :------------| :------ | :---------- | :-----------------------
 | When Machine Unlearning Jeopardizes Privacy | CMU | CCS/2021 | 提出unlearn会造成隐私泄露，可以根据unlearn前后单目标的后验概率的差异判断数据是否被删；两种聚合unlearn前后的后验概率的方案，作为攻击模型的输入，concatenating（在过拟合模型攻击效果好）/求差（在泛化性能好的模型攻击效果好）。2个指标衡量损失了多少隐私（目标样本置信度高于经典MIA的比例&置信度增量的平均值）并提出4个防御方案| 
+| Inexact Unlearning Needs More Careful Evaluations to Avoid a False Sense of Privacy | google | arxiv/2024 | 提出当前对于遗忘学习的评估方案都是基于Population的MIA，这种评估方式会低估unlearning的隐私泄露（即高估unlearning的efficacy）。文章提出per-example的MIA，提出U-LIRA来对unlearing进行隐私审计，即审计unlearing的efficacy。本质上改造了LIRA，来在unlearning上实现推理攻击| 
 
 ## Unlearning in FL
 | Title | Team/Main Author | Venue and Year | Key Description 
